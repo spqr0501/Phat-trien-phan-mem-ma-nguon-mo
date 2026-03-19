@@ -1,0 +1,80 @@
+<!-- product-list.html (updated with toast for delete) -->
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Danh sách sản phẩm</h3>
+    <div class="box-tools">
+      <a href="#" class="btn btn-success btn-sm load-content" data-url="/admin/product-add">
+        <i class="fa fa-plus"></i> Thêm mới
+      </a>
+    </div>
+  </div>
+  <div class="box-body table-responsive no-padding">
+    <table class="table table-hover">
+      <tr>
+        <th style="width: 80px;">Hình</th>
+        <th>Mã HH</th>
+        <th>Tên hàng hóa</th>
+        <th>Đơn giá</th>
+        <th>Giảm giá</th>
+        <th>Số lượng tồn kho</th>
+        <th style="width: 250px;">Hành động</th>
+      </tr>
+      <tr th:each="p : ${listPro}">
+        <td>
+          <img th:if="${p.hinh != null and !p.hinh.isEmpty()}"
+            th:src="@{'/Images/' + ${p.hinh} + '?_t=' + ${#dates.createNow().time}}" alt="Product"
+            style="width: 60px; height: 60px; object-fit: cover;">
+          <img th:unless="${p.hinh != null and !p.hinh.isEmpty()}" src="/Images/no-image.png" alt="No Image"
+            style="width: 60px; height: 60px; object-fit: cover;">
+        </td>
+        <td th:text="${p.mahh}"></td>
+        <td th:text="${p.tenhh}"></td>
+        <td>
+          <span th:text="${#numbers.formatDecimal(p.dongia, 0, 'COMMA', 0, 'POINT')}"></span> ₫
+        </td>
+        <td>
+          <span th:text="${#numbers.formatDecimal(p.giamgia, 0, 'COMMA', 0, 'POINT')}"></span> ₫
+          <span th:if="${p.giamgia > 0}" class="label label-success" th:text="'-' + ${p.phanTramGiam} + '%'"></span>
+        </td>
+        <td th:text="${p.soluong != null ? p.soluong : 0}">0</td>
+        <td>
+          <a href="#" class="btn btn-info btn-xs load-content" th:data-url="@{'/admin/product/detail/' + ${p.mahh}}">
+            <i class="fa fa-eye"></i> Chi tiết
+          </a>
+          <a href="#" class="btn btn-primary btn-xs load-content" th:data-url="@{'/admin/product/edit/' + ${p.mahh}}">
+            <i class="fa fa-edit"></i> Sửa
+          </a>
+          <a href="#" class="btn btn-danger btn-xs delete-btn" th:data-url="@{'/admin/product/delete/' + ${p.mahh}}">
+            <i class="fa fa-trash"></i> Xóa
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $('.delete-btn').on('click', function (e) {
+      e.preventDefault();
+      if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
+
+      var url = $(this).data('url');
+      $.get(url)
+        .done(function (res) {
+          // SỬ DỤNG TOAST thay vì alert
+          if (res.success) {
+            showToast(res.message, 'success');
+            setTimeout(function () {
+              loadContent('/admin/product');
+            }, 1000);
+          } else {
+            showToast(res.message, 'error');
+          }
+        })
+        .fail(function () {
+          showToast('Có lỗi xảy ra khi xóa!', 'error');
+        });
+    });
+  });
+</script>

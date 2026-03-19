@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>AdminLTE 2 | Dashboard</title>
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/AdminLTE.css">
+  <link rel="stylesheet" href="css/_all-skins.min.css">
+  <link rel="stylesheet" href="css/jquery-ui.css">
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Global CSS & JS for toast notifications -->
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/global.js" defer></script>
+  <script src="js/angular.min.js"></script>
+  <script src="js/app.js"></script>
+</head>
+
+<body class="hold-transition skin-blue sidebar-mini">
+  <!-- Toast notification will be shown here -->
+
+  <script th:if="${success}" th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof showToast === 'function') {
+        showToast([[${ success }]], 'success');
+      } else {
+        alert([[${ success }]]);
+      }
+    });
+    /*]]>*/
+  </script>
+
+  <script th:if="${error}" th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof showToast === 'function') {
+        showToast([[${ error }]], 'error');
+      } else {
+        alert([[${ error }]]);
+      }
+    });
+    /*]]>*/
+  </script>
+  <div class="wrapper">
+
+    <header class="main-header">
+      <a href="/admin" class="logo">
+        <span class="logo-mini"><b>A</b>LT</span>
+        <span class="logo-lg">PCTECH_STORE</span>
+      </a>
+      <nav class="navbar navbar-static-top">
+        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+
+        <div class="navbar-custom-menu">
+          <ul class="nav navbar-nav">
+            <!-- VỀ TRANG CHỦ -->
+            <li>
+              <a href="/" title="Về trang chủ">
+                <i class="fa fa-home"></i> Trang chủ
+              </a>
+            </li>
+
+            <!-- Pending Orders Notification -->
+            <li class="dropdown messages-menu">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-envelope-o"></i>
+                <span class="label label-success" id="pending-order-count">0</span>
+              </a>
+              <ul class="dropdown-menu">
+                <li class="header" id="pending-header">Đơn hàng chờ xử lý</li>
+                <li>
+                  <ul class="menu" id="pending-orders-list">
+                    <!-- Loaded dynamically -->
+                  </ul>
+                </li>
+                <li class="footer">
+                  <a href="#" class="load-content" data-url="/admin/orders">Xem tất cả đơn hàng</a>
+                </li>
+              </ul>
+            </li>
+
+            <!-- User Account -->
+            <li class="dropdown user user-menu">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <img src="images/user2-160x160.jpg" class="user-image admin-avatar" alt="User Image">
+                <span class="hidden-xs" sec:authentication="name">Administrator</span>
+              </a>
+              <ul class="dropdown-menu">
+                <li class="user-header">
+                  <img src="images/user2-160x160.jpg" class="img-circle admin-avatar" alt="User Image">
+                  <p>
+                    <span sec:authentication="name">Administrator</span>
+                    <small>Quản trị viên hệ thống</small>
+                  </p>
+                </li>
+                <li class="user-footer">
+                  <div class="pull-left">
+                    <a href="#" class="btn btn-default btn-flat load-content" data-url="/admin/profile">Hồ sơ</a>
+                  </div>
+                  <div class="pull-right">
+                    <a th:href="@{/logout}" class="btn btn-default btn-flat">Đăng xuất</a>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="main-sidebar">
+      <section class="sidebar">
+        <div class="user-panel">
+          <div class="pull-left image">
+            <img src="images/user2-160x160.jpg" class="img-circle admin-avatar" alt="User Image">
+          </div>
+          <div class="pull-left info">
+            <p sec:authentication="name">Administrator</p>
+            <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+          </div>
+        </div>
+
+        <form action="#" method="get" class="sidebar-form">
+          <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Tìm kiếm...">
+            <span class="input-group-btn">
+              <button type="submit" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
+            </span>
+          </div>
+        </form>
+
+        <ul class="sidebar-menu" data-widget="tree">
+          <li class="header">MENU QUẢN TRỊ</li>
+
+          <!-- Quản lý Sản phẩm Linh kiện -->
+          <li class="treeview">
+            <a href="#">
+              <i class="fa fa-cubes"></i> <span>Quản lý Linh kiện</span>
+              <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href="#" class="load-content" data-url="/admin/product"><i class="fa fa-circle-o"></i> Danh sách
+                  linh kiện</a></li>
+              <li><a href="#" class="load-content" data-url="/admin/product-add"><i class="fa fa-circle-o"></i> Thêm
+                  linh kiện</a></li>
+            </ul>
+          </li>
+
+          <!-- Quản lý Danh mục Linh kiện -->
+          <li class="treeview">
+            <a href="#">
+              <i class="fa fa-tags"></i> <span>Quản lý Danh mục</span>
+              <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href="#" class="load-content" data-url="/admin/category"><i class="fa fa-circle-o"></i> Danh sách
+                  danh mục</a></li>
+              <li><a href="#" class="load-content" data-url="/admin/category-add"><i class="fa fa-circle-o"></i> Thêm
+                  danh mục</a></li>
+            </ul>
+          </li>
+
+          <!-- Quản lý Người dùng -->
+          <li class="treeview">
+            <a href="#">
+              <i class="fa fa-users"></i> <span>Quản lý Người dùng</span>
+              <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href="#" class="load-content" data-url="/admin/user"><i class="fa fa-circle-o"></i> Danh sách người
+                  dùng</a></li>
+              <li><a href="#" class="load-content" data-url="/admin/user-add"><i class="fa fa-circle-o"></i> Thêm người
+                  dùng</a></li>
+            </ul>
+          </li>
+
+          <!-- Quản lý Khách hàng -->
+          <li class="treeview">
+            <a href="#">
+              <i class="fa fa-user-circle-o"></i> <span>Quản lý Khách hàng</span>
+              <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href="#" class="load-content" data-url="/admin/customer"><i class="fa fa-circle-o"></i> Danh sách
+                  khách hàng</a></li>
+              <li><a href="#" class="load-content" data-url="/admin/customer-add"><i class="fa fa-circle-o"></i> Thêm
+                  khách hàng</a></li>
+            </ul>
+          </li>
+
+          <!-- Quản lý Đơn hàng -->
+          <li>
+            <a href="#" class="load-content" data-url="/admin/orders">
+              <i class="fa fa-shopping-cart"></i> <span>Quản lý Đơn hàng</span>
+            </a>
+          </li>
+
+          <!-- Analytics Dashboard -->
+          <li>
+            <a href="/admin/dashboard">
+              <i class="fa fa-line-chart"></i> <span>Analytics Dashboard</span>
+              <span class="pull-right-container">
+                <small class="label pull-right bg-blue">NEW</small>
+              </span>
+            </a>
+          </li>
+
+          <!-- Các menu cũ của bạn vẫn giữ nguyên (Đã ẩn) -->
+          <!--
+          <li>
+            <a href="menu.html">
+              <i class="fa fa-th"></i> <span>Quản lý Menu </span>
+              <span class="pull-right-container">
+                <small class="label pull-right bg-green">FE</small>
+              </span>
+            </a>
+          </li>
+
+          <li class="treeview">
+            <a href="#">
+              <i class="fa fa-dashboard"></i> <span>Quản lý banner</span>
+              <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+            </a>
+            <ul class="treeview-menu">
+              <li><a href=""><i class="fa fa-circle-o"></i> Dashboard v1</a></li>
+              <li><a href=""><i class="fa fa-circle-o"></i> Dashboard v2</a></li>
+            </ul>
+          </li>
+
+          <li>
+            <a href="">
+              <i class="fa fa-th"></i> <span>Widgets</span>
+              <span class="pull-right-container">
+                <small class="label pull-right bg-green">Hot</small>
+              </span>
+            </a>
+          </li>
+          -->
+        </ul>
+      </section>
+    </aside>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+      <section class="content-header">
+        <h1>
+          Trang quản trị
+          <small>Hệ thống quản lý linh kiện máy tính</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="/admin"><i class="fa fa-dashboard"></i> Admin</a></li>
+          <li class="active">Dashboard</li>
+        </ol>
+      </section>
+
+      <!-- PHẦN NỘI DUNG SẼ ĐƯỢC LOAD VÀO ĐÂY -->
+      <section class="content">
+        <div id="dynamic-content">
+          <div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title"><i class="fa fa-desktop"></i> Chào mừng đến PCTech Store</h3>
+            </div>
+            <div class="box-body">
+              <p>Hệ thống quản lý cửa hàng linh kiện máy tính. Vui lòng chọn menu bên trái để bắt đầu.</p>
+              <div class="callout callout-info">
+                <h4><i class="fa fa-microchip"></i> Hướng dẫn!</h4>
+                <p><strong>Quản lý sản phẩm:</strong> CPU, GPU, RAM, Mainboard, SSD, HDD, Case, PSU, Cooling...</p>
+                <p><strong>Quản lý đơn hàng:</strong> Xem và xử lý đơn hàng linh kiện từ khách hàng</p>
+                <p><strong>Tất cả thao tác:</strong> Thêm, sửa, xóa đều được thực hiện ngay trên trang này mà không cần
+                  tải lại</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="main-footer">
+      <div class="pull-right hidden-xs">
+        <b>Version</b> 0.0.1
+      </div>
+      <strong>Copyright &copy; 2018 <a href="https://adminlte.io">TTPM_BKAP</a>.</strong> All rights reserved.
+    </footer>
+  </div>
+
+  <!-- jQuery & Bootstrap -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-ui.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/adminlte.min.js"></script>
+
+  <script>
+    // AJAX Form Submit Handler với Toast Notification
+    $(document).ready(function () {
+      // Handle form submit for add/update
+      $(document).on('submit', 'form[action*="/admin/"]', function (e) {
+        var action = $(this).attr('action');
+
+        // Chỉ xử lý AJAX cho các form update, add, delete
+        if (action && (action.includes('/update') || action.includes('-add'))) {
+          e.preventDefault();
+
+          var formData = $(this).serialize();
+          var submitBtn = $(this).find('button[type="submit"]');
+          var originalText = submitBtn.html();
+
+          // Show loading
+          submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+
+          $.ajax({
+            url: action,
+            type: 'POST',
+            data: formData,
+            success: function (response) {
+              submitBtn.prop('disabled', false).html(originalText);
+
+              if (response.success) {
+                // Show toast notification
+                if (typeof showToast === 'function') {
+                  showToast(response.message, 'success');
+                } else {
+                  alert(response.message);
+                }
+
+                // Reload content list
+                var listUrl = '';
+                if (action.includes('/user')) {
+                  listUrl = '/admin/user';
+                } else if (action.includes('/customer')) {
+                  listUrl = '/admin/customer';
+                } else if (action.includes('/category')) {
+                  listUrl = '/admin/category';
+                } else if (action.includes('/product')) {
+                  listUrl = '/admin/product';
+                }
+
+                if (listUrl) {
+                  setTimeout(function () {
+                    loadContent(listUrl);
+                  }, 500);
+                }
+              } else {
+                if (typeof showToast === 'function') {
+                  showToast(response.message, 'error');
+                } else {
+                  alert(response.message);
+                }
+              }
+            },
+            error: function (xhr) {
+              submitBtn.prop('disabled', false).html(originalText);
+              var errorMsg = 'Có lỗi xảy ra!';
+              if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+              }
+              if (typeof showToast === 'function') {
+                showToast(errorMsg, 'error');
+              } else {
+                alert(errorMsg);
+              }
+            }
+          });
+
+          return false;
+        }
+      });
+    });
+  </script>
+
+  <script src="js/dashboard.js"></script>
+  <script src="tinymce/tinymce.min.js"></script>
+  <script src="tinymce/config.js"></script>
+  <script src="js/function.js"></script>
+
+  <!-- Load admin avatar & pending orders -->
+  <script>
+    $(document).ready(function() {
+      // Load avatar
+      $.get('/profile/api/avatar', function(data) {
+        if (data.avatar) {
+          $('.admin-avatar').attr('src', data.avatar);
+        }
+      });
+
+      // Load pending orders
+      $.get('/admin/orders/api/pending', function(data) {
+        if (data.count !== undefined) {
+          $('#pending-order-count').text(data.count);
+          $('#pending-header').text('Có ' + data.count + ' đơn hàng chờ xử lý');
+
+          var list = $('#pending-orders-list');
+          list.empty();
+
+          if (data.orders && data.orders.length > 0) {
+            data.orders.forEach(function(order) {
+              var total = Number(order.totalAmount).toLocaleString('vi-VN');
+              var statusClass = order.status === 'Pending' ? 'label-warning' : 'label-info';
+              var html = '<li><a href="#" class="load-content" data-url="/admin/orders">' +
+                '<h4>#' + order.orderId + ' - ' + (order.customerName || 'Khách') +
+                ' <small><span class="label ' + statusClass + '">' + order.status + '</span></small></h4>' +
+                '<p>' + total + ' ₫</p></a></li>';
+              list.append(html);
+            });
+          } else {
+            list.append('<li><a href="#"><p>Không có đơn hàng mới</p></a></li>');
+          }
+        }
+      });
+    });
+  </script>
+
+  <!-- Script Ajax Load Content - SỬ DỤNG EVENT DELEGATION -->
+  <script>
+    $(document).ready(function () {
+      // SỬ DỤNG EVENT DELEGATION để bind sự kiện cho cả element hiện tại và tương lai
+      $(document).on('click', '.load-content', function (e) {
+        e.preventDefault();
+
+        var url = $(this).data('url');
+        var title = $(this).text().trim();
+
+        // Gọi hàm loadContent từ function.js
+        loadContent(url, title);
+      });
+
+      console.log('Admin panel initialized with event delegation');
+    });
+  </script>
+
+</body>
+
+</html>

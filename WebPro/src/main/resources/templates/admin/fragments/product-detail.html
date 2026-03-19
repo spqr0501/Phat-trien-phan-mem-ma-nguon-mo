@@ -1,0 +1,115 @@
+<!-- product-detail.html - FIXED: Corrected Thymeleaf boolean expressions -->
+<div class="box" th:fragment="content">
+    <div class="box-header with-border">
+        <h3 class="box-title">Chi tiết sản phẩm</h3>
+        <div class="box-tools">
+            <button type="button" class="btn btn-default btn-sm" onclick="loadContent('/admin/product')">
+                <i class="fa fa-arrow-left"></i> Quay lại
+            </button>
+        </div>
+    </div>
+    <div class="box-body">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="row" th:if="${product}">
+            <div class="col-md-4">
+                <!-- SỬA: Dùng #strings.isEmpty() thay vì !product.hinh.isEmpty() -->
+                <img th:if="${product.hinh != null and not #strings.isEmpty(product.hinh)}"
+                    th:src="@{'/Images/' + ${product.hinh} + '?_t=' + ${#dates.createNow().time}}" alt="Product Image" class="img-responsive img-thumbnail"
+                    style="max-width: 100%;">
+                <img th:if="${product.hinh == null or #strings.isEmpty(product.hinh)}" src="/Images/no-image.png"
+                    alt="No Image" class="img-responsive img-thumbnail">
+            </div>
+            <div class="col-md-8">
+                <table class="table table-bordered">
+                    <tr>
+                        <th style="width: 200px;">Mã hàng hóa</th>
+                        <td th:text="${product.mahh}"></td>
+                    </tr>
+                    <tr>
+                        <th>Tên hàng hóa</th>
+                        <td th:text="${product.tenhh}"></td>
+                    </tr>
+                    <tr>
+                        <th>Đơn giá</th>
+                        <td>
+                            <span th:text="${#numbers.formatDecimal(product.dongia, 0, 'COMMA', 0, 'POINT')}"></span>
+                            VNĐ
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Giảm giá</th>
+                        <td>
+                            <span th:text="${#numbers.formatDecimal(product.giamgia, 0, 'COMMA', 0, 'POINT')}"></span>
+                            VNĐ
+                            <span th:if="${product.giamgia > 0}" class="label label-success"
+                                th:text="'-' + ${product.phanTramGiam} + '%'"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Giá hiện tại</th>
+                        <td>
+                            <strong class="text-danger" style="font-size: 18px;">
+                                <span
+                                    th:text="${#numbers.formatDecimal(product.giaHienTai, 0, 'COMMA', 0, 'POINT')}"></span>
+                                VNĐ
+                            </strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Xuất xứ</th>
+                        <td th:text="${product.xuatxu}"></td>
+                    </tr>
+                    <tr>
+                        <th>Loại hàng</th>
+                        <td>
+                            <span th:each="cat : ${categories}" th:if="${cat.maloai == product.loaihh}"
+                                th:text="${cat.tenloai}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Xu hướng</th>
+                        <td>
+                            <span th:if="${product.xuhuong}" class="label label-warning">
+                                <i class="fa fa-star"></i> Xu hướng
+                            </span>
+                            <span th:unless="${product.xuhuong}" class="text-muted">Không</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Phổ biến</th>
+                        <td>
+                            <span th:if="${product.phobien}" class="label label-info">
+                                <i class="fa fa-fire"></i> Phổ biến
+                            </span>
+                            <span th:unless="${product.phobien}" class="text-muted">Không</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Tồn kho</th>
+                        <td>
+                            <span th:text="${product.soluong != null ? product.soluong : 0}">0</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- SỬA: Dùng #strings.isEmpty() -->
+        <div class="row" th:if="${product != null and product.mota != null and not #strings.isEmpty(product.mota)}">
+            <div class="col-md-12">
+                <h4>Mô tả sản phẩm:</h4>
+                <div class="well" th:utext="${product.mota}"></div>
+            </div>
+        </div>
+
+        <div class="box-footer" th:if="${product != null}">
+            <a href="#" class="btn btn-primary load-content" th:data-url="@{'/admin/product/edit/' + ${product.mahh}}">
+                <i class="fa fa-edit"></i> Chỉnh sửa
+            </a>
+            <button type="button" class="btn btn-default" onclick="loadContent('/admin/product')">
+                <i class="fa fa-list"></i> Danh sách
+            </button>
+        </div>
+    </div>
+</div>

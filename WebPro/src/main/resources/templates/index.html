@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="PCTech Store - Cửa hàng linh kiện máy tính chính hãng, giá tốt nhất thị trường">
+    <meta name="theme-color" content="#d4a373">
+    <!-- Ngăn browser cache để hiển thị đúng trạng thái đăng nhập -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/Images/icon-192.png">
+
+    <title>PCTech Store - Linh kiện máy tính chính hãng</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <script src="/js/global.js" defer></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+            scroll-behavior: smooth;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #logo p {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #d4a373 0%, #f4d03f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .menu {
+            list-style: none;
+            display: flex;
+            gap: 35px;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 5px 0;
+            transition: color 0.3s;
+        }
+
+        .menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #d4a373;
+            transition: width 0.3s;
+        }
+
+        .menu a:hover::after {
+            width: 100%;
+        }
+
+        .menu a:hover {
+            color: #d4a373;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-search {
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
+        }
+
+        .header-search input {
+            padding: 8px 15px;
+            border: 2px solid #444;
+            border-radius: 25px 0 0 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 250px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .header-search input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .header-search input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #d4a373;
+            width: 300px;
+        }
+
+        .header-search button {
+            padding: 8px 20px;
+            border: 2px solid #d4a373;
+            border-left: none;
+            border-radius: 0 25px 25px 0;
+            background: #d4a373;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .header-search button:hover {
+            background: #c89563;
+            border-color: #c89563;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-icon a {
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .admin-btn {
+            background: linear-gradient(135deg, #d4a373 0%, #c89968 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
+            transition: all 0.3s;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
+        }
+
+        #banner {
+            position: relative;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        #banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.7);
+        }
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .banner-overlay h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s;
+        }
+
+        .banner-overlay p {
+            font-size: 24px;
+            margin-bottom: 30px;
+            animation: fadeInUp 1.2s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .shopnow {
+            background: #d4a373;
+            color: white;
+            padding: 18px 50px;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.4);
+            transition: all 0.3s;
+            animation: fadeInUp 1.4s;
+        }
+
+        .shopnow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 163, 115, 0.6);
+            background: #c89968;
+        }
+
+        .trending,
+        .popular {
+            padding: 80px 50px;
+        }
+
+        .trending h2,
+        .popular h2 {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .intro {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+            color: #666;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .product-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 35px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product {
+            background: white;
+            text-align: center;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .product:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .product img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .product:hover img {
+            transform: scale(1.05);
+        }
+
+        .product p {
+            margin: 20px 20px 10px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .product span {
+            color: #d4a373;
+            font-size: 22px;
+            display: block;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        .product .btn-add-cart {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0 20px 20px;
+            transition: all 0.3s;
+            width: calc(100% - 40px);
+        }
+
+        .product .btn-add-cart:hover {
+            background: #d4a373;
+            transform: scale(1.02);
+        }
+
+        #about {
+            padding: 100px 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        #about h2 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 25px;
+        }
+
+        #about .intro-text {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 70px;
+            font-size: 18px;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feature i {
+            font-size: 56px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f4d03f 0%, #d4a373 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .feature p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        #contact {
+            padding: 100px 50px;
+            background: white;
+        }
+
+        #contact h2 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            font-size: 42px;
+            color: #333;
+            margin-bottom: 60px;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .contact-info h3 {
+            font-size: 26px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        .contact-item:hover {
+            background: #f8f9fa;
+        }
+
+        .contact-item i {
+            font-size: 28px;
+            color: #d4a373;
+            margin-right: 20px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .social-links {
+            margin-top: 40px;
+        }
+
+        .social-links a {
+            font-size: 32px;
+            margin-right: 20px;
+            transition: transform 0.3s;
+            display: inline-block;
+        }
+
+        .social-links a:hover {
+            transform: scale(1.2);
+        }
+
+        .contact-form h3 {
+            font-size: 26px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: #d4a373;
+        }
+
+        .contact-form button {
+            background: linear-gradient(135deg, #d4a373 0%, #c89968 100%);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 8px 20px rgba(212, 163, 115, 0.3);
+            transition: all 0.3s;
+        }
+
+        .contact-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(212, 163, 115, 0.4);
+        }
+
+        footer {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 60px 50px 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 50px;
+            max-width: 1400px;
+            margin: 0 auto 40px;
+        }
+
+        .footer-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: #d4a373;
+            margin-bottom: 20px;
+        }
+
+        .footer-section p {
+            color: #999;
+            line-height: 1.8;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #999;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #d4a373;
+        }
+
+        .newsletter input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .newsletter button {
+            width: 100%;
+            background: #d4a373;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .newsletter button:hover {
+            background: #c89968;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+            color: #666;
+        }
+
+        #scrollToTop {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d4a373 0%, #c89968 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 5px 20px rgba(212, 163, 115, 0.4);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        #scrollToTop:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(212, 163, 115, 0.6);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Scroll to top button -->
+    <button id="scrollToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <header>
+        <div id="logo">
+            <p>PCTECH STORE</p>
+        </div>
+
+        <nav id="hnav">
+            <ul class="menu">
+                <li><a href="/">TRANG CHỦ</a></li>
+                <li><a href="/shop">SẢN PHẨM</a></li>
+                <li><a href="/cart">GIỎ HÀNG</a></li>
+                <li sec:authorize="isAuthenticated()"><a href="/wishlist">WISHLIST</a></li>
+                <li sec:authorize="isAuthenticated()"><a href="/orders/history">ĐƠN HÀNG</a></li>
+                <li><a href="#about">GIỚI THIỆU</a></li>
+                <li><a href="#contact">LIÊN HỆ</a></li>
+            </ul>
+
+            <!-- Search Form -->
+            <form action="/search" method="get" class="header-search">
+                <input type="text" name="keyword" placeholder="Tìm kiếm sản phẩm..." required>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </nav>
+
+        <div class="user-menu">
+            <!-- Dark Mode Toggle -->
+            <button id="darkModeToggle" title="Chế độ tối">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <div class="cart-icon">
+                <a th:href="@{/cart}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" th:text="${session.cart != null ? session.cart.size() : 0}">0</span>
+                </a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()">
+                <a href="/profile"
+                    style="color: white; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()" style="color: #d4a373;">
+                <i class="fas fa-user"></i> <span sec:authentication="principal.hoten">User</span>
+            </div>
+
+            <div sec:authorize="hasRole('ADMIN')">
+                <a href="/admin" class="admin-btn">Quản trị</a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()">
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit"
+                        style="background:none;border:none;color:white;cursor:pointer;font-size:14px;">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </button>
+                </form>
+            </div>
+
+            <div sec:authorize="isAnonymous()">
+                <a href="/login" style="color:white; text-decoration:none;font-weight:500;">
+                    <i class="fas fa-sign-in-alt"></i> ĐĂNG NHẬP
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Banner -->
+        <div id="banner">
+            <img th:src="@{/Images/hinh_nen.jpg}" alt="PCTECH_STORE Banner">
+            <div class="banner-overlay">
+                <h1>PCTECH STORE</h1>
+                <p>Linh kiện máy tính chính hãng - Giá tốt nhất</p>
+                <a href="/shop" class="shopnow">KHÁM PHÁ NGAY</a>
+            </div>
+        </div>
+
+        <!-- Trending Products -->
+        <section class="trending">
+            <h2>SẢN PHẨM XU HƯỚNG</h2>
+            <p class="intro">
+                Khám phá những linh kiện máy tính mới nhất trên thị trường.
+                Từ CPU, GPU đến RAM, SSD - Tất cả đều chính hãng 100%.
+            </p>
+            <div class="product-container">
+                <div th:each="p : ${listPro}" class="product">
+                    <a th:href="@{/product/{id}(id=${p.mahh})}" style="text-decoration:none; color:inherit;">
+                        <img th:src="@{'/Images/' + ${p.hinh} + '?_t=' + ${#dates.createNow().time}}" alt="Product">
+                        <p th:text="${p.tenhh}">Tên sản phẩm</p>
+                        <span th:text="'₫' + ${#numbers.formatInteger(p.dongia, 0, 'DEFAULT')}">0₫</span>
+                    </a>
+
+                    <button class="btn-add-cart" th:attr="data-product-id=${p.mahh}"
+                        th:disabled="${p.soluong == null || p.soluong <= 0}"
+                        th:title="${p.soluong == null || p.soluong <= 0} ? 'Hết hàng' : 'Thêm vào giỏ'"
+                        onclick="addToCart(this.getAttribute('data-product-id'), 1)">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span th:text="${p.soluong == null || p.soluong <= 0} ? 'Hết hàng' : 'Thêm vào giỏ'">Thêm vào giỏ</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popular Products -->
+        <section class="popular" style="background: white;">
+            <h2>SẢN PHẨM PHỔ BIẾN</h2>
+            <p class="intro">
+                Những linh kiện được đánh giá cao bởi khách hàng.
+                Chất lượng đã được kiểm chứng qua thời gian sử dụng.
+            </p>
+            <div class="product-container">
+                <div th:each="p : ${listProPhobien}" class="product">
+                    <a th:href="@{/product/{id}(id=${p.mahh})}" style="text-decoration:none; color:inherit;">
+                        <img th:src="@{'/Images/' + ${p.hinh} + '?_t=' + ${#dates.createNow().time}}" alt="Product">
+                        <p th:text="${p.tenhh}">Tên sản phẩm</p>
+                        <span th:text="'₫' + ${#numbers.formatInteger(p.dongia, 0, 'DEFAULT')}">0₫</span>
+                    </a>
+
+                    <button class="btn-add-cart" th:attr="data-product-id=${p.mahh}"
+                        th:disabled="${p.soluong == null || p.soluong <= 0}"
+                        th:title="${p.soluong == null || p.soluong <= 0} ? 'Hết hàng' : 'Thêm vào giỏ'"
+                        onclick="addToCartAjax(this.getAttribute('data-product-id'), 1, this)">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span th:text="${p.soluong == null || p.soluong <= 0} ? 'Hết hàng' : 'Thêm vào giỏ'">Thêm vào giỏ</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <h2>VỀ PCTECH STORE</h2>
+            <p class="intro-text">
+                Khởi nguồn từ đam mê công nghệ và PC gaming, PCTech Store được thành lập năm 2014 bởi một nhóm game thủ
+                và tech enthusiast.
+                Với hơn 10 năm kinh nghiệm, chúng tôi tự hào là đơn vị tiên phong phân phối linh kiện máy tính chính
+                hãng tại Việt Nam,
+                phục vụ hơn 12,000+ khách hàng với tỷ lệ hài lòng 98%.
+            </p>
+
+            <div class="features">
+                <div class="feature">
+                    <i class="fa fa-microchip"></i>
+                    <h3>Linh Kiện Chính Hãng 100%</h3>
+                    <p>Nhập khẩu trực tiếp từ Intel, AMD, NVIDIA, Corsair, Kingston. Tem chống hàng giả, bảo hành đầy
+                        đủ.</p>
+                </div>
+
+                <div class="feature">
+                    <i class="fas fa-shipping-fast"></i>
+                    <h3>Giao Hàng & Lắp Đặt</h3>
+                    <p>Miễn phí ship toàn quốc cho đơn >1 triệu. Hỗ trợ build PC miễn phí khi mua linh kiện tại shop.
+                    </p>
+                </div>
+
+                <div class="feature">
+                    <i class="fas fa-tools"></i>
+                    <h3>Hỗ Trợ Kỹ Thuật 24/7</h3>
+                    <p>Tư vấn build PC, troubleshoot, overclock. Bảo hành nhanh 24-48h. Community Discord 5000+ thành
+                        viên.</p>
+                </div>
+            </div>
+
+            <!-- Testimonials Section -->
+            <div style="margin-top: 80px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+                <h2 style="text-align: center; font-size: 36px; margin-bottom: 50px;">KHÁCH HÀNG NÓI GÌ VỀ CHÚNG TÔI
+                </h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                    <!-- Testimonial 1 -->
+                    <div
+                        style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px; color: #f4d03f;">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p style="font-style: italic; margin-bottom: 15px; line-height: 1.6;">
+                            "Build gaming PC đầu tiên và tôi cực kỳ hài lòng! Anh Phúc tư vấn rất tận tâm, không đẩy mua
+                            đồ đắt không cần thiết.
+                            Giờ tôi chơi VALORANT 300+ FPS max settings. Quá đã!"
+                        </p>
+                        <strong>Nguyễn Văn A</strong> - Game thủ VALORANT<br>
+                        <small>Build: i5-13600K + RTX 4060 Ti</small>
+                    </div>
+
+                    <!-- Testimonial 2 -->
+                    <div
+                        style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px; color: #f4d03f;">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p style="font-style: italic; margin-bottom: 15px; line-height: 1.6;">
+                            "Workstation render 3D của tôi giảm thời gian render từ 8 giờ xuống 1.5 giờ! ROI chỉ sau 2
+                            tháng.
+                            Build được lắp ráp cẩn thận, cable management đẹp, overclock stable. 10/10!"
+                        </p>
+                        <strong>Trần Thị B</strong> - 3D Artist<br>
+                        <small>Build: Ryzen 9 7950X + RTX 4090</small>
+                    </div>
+
+                    <!-- Testimonial 3 -->
+                    <div
+                        style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px);">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px; color: #f4d03f;">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p style="font-style: italic; margin-bottom: 15px; line-height: 1.6;">
+                            "RAM bị lỗi, inbox lúc 9h tối, 15 phút sau có anh kỹ thuật gọi support. Hôm sau đổi RAM mới
+                            ngay không chờ.
+                            Đây mới là dịch vụ sau bán hàng!"
+                        </p>
+                        <strong>Lê Hoàng C</strong> - Streamer<br>
+                        <small>Build: i7-14700K + RTX 4080 SUPER</small>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <p style="font-size: 18px;">⭐ <strong>4.9/5</strong> từ 1,200+ reviews |
+                        <strong>12,000+</strong> PC builds | <strong>98%</strong> khách hàng quay lại
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact">
+            <h2>LIÊN HỆ VỚI CHÚNG TÔI</h2>
+
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Thông tin liên hệ</h3>
+
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Địa chỉ</strong><br>
+                            123 Đường ABC, Quận 1, TP. Hồ Chí Minh
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <strong>Điện thoại</strong><br>
+                            0901 234 567
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <strong>Email</strong><br>
+                            contact@pctech.vn
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <strong>Giờ làm việc</strong><br>
+                            T2 - T7: 8:00 - 21:00<br>
+                            Chủ nhật: 9:00 - 18:00
+                        </div>
+                    </div>
+
+                    <div class="social-links">
+                        <a href="#" style="color: #3b5998;"><i class="fab fa-facebook"></i></a>
+                        <a href="#" style="color: #E1306C;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: #25D366;"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" style="color: #FF0000;"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <h3>Gửi tin nhắn cho chúng tôi</h3>
+                    <form>
+                        <input type="text" placeholder="Họ và tên *" required>
+                        <input type="email" placeholder="Email *" required>
+                        <input type="tel" placeholder="Số điện thoại">
+                        <textarea rows="5" placeholder="Nội dung tin nhắn *" required></textarea>
+                        <button type="submit">
+                            <i class="fas fa-paper-plane"></i> GỬI TIN NHẮN
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>PCTECH STORE</h3>
+                <p>Cửa hàng linh kiện máy tính uy tín hàng đầu Việt Nam. Chuyên cung cấp linh kiện PC chính
+                    hãng,
+                    giá tốt, bảo hành toàn diện. Build PC - Nâng cấp - Tư vấn miễn phí.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Liên kết</h3>
+                <ul class="footer-links">
+                    <li><a href="/">Trang chủ</a></li>
+                    <li><a href="/shop">Sản phẩm</a></li>
+                    <li><a href="/cart">Giỏ hàng</a></li>
+                    <li><a href="#about">Giới thiệu</a></li>
+                    <li><a href="#contact">Liên hệ</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Hỗ trợ</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Chính sách đổi trả</a></li>
+                    <li><a href="#">Hướng dẫn đặt hàng</a></li>
+                    <li><a href="#">Bảo hành sản phẩm</a></li>
+                    <li><a href="#">Câu hỏi thường gặp</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Nhận tin khuyến mãi</h3>
+                <p style="margin-bottom: 15px;">Đăng ký để nhận những ưu đãi mới nhất</p>
+                <div class="newsletter">
+                    <input type="email" placeholder="Email của bạn">
+                    <button><i class="fas fa-envelope"></i> Đăng ký ngay</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2025 PCTech Store. All rights reserved. | Designed with <i class="fas fa-heart"
+                    style="color: #e74c3c;"></i> by Vũ</p>
+        </div>
+    </footer>
+
+    <!-- External JavaScript -->
+    <script src="/js/cart.js"></script>
+
+</body>
+
+</html>

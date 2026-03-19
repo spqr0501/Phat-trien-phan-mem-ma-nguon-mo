@@ -1,0 +1,66 @@
+<!-- category-form.html - FIXED: Removed duplicate jQuery and fixed script -->
+<div class="box" th:fragment="content">
+  <div class="box-header with-border">
+    <h3 class="box-title" th:text="${title}">Thêm loại hàng</h3>
+  </div>
+  <div class="box-body">
+    <div th:if="${msg}" class="alert alert-success" th:text="${msg}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <form th:action="${action}" th:object="${category}" method="post" class="form-horizontal" id="categoryForm">
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Mã loại <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+          <input type="number" class="form-control" th:field="*{maloai}" required
+            th:readonly="${action.contains('update')} ? true : false" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Tên loại <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" th:field="*{tenloai}" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+          <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Lưu lại</button>
+          <button type="button" class="btn btn-default" onclick="loadContent('/admin/category')"><i
+              class="fa fa-times"></i> Quay lại</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SỬA: Không load jQuery riêng, dùng jQuery đã có từ admin/index.html -->
+<script>
+  // SỬA: Dùng $(function()) thay vì $(document).ready() cho dynamic content
+  $(function () {
+    $('#categoryForm').on('submit', function (e) {
+      e.preventDefault();
+      var formData = new FormData(this);
+      $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (res) {
+          if (res.success) {
+            showToast(res.message, 'success');
+            setTimeout(function () {
+              loadContent('/admin/category');
+            }, 1000);
+          } else {
+            showToast(res.message, 'error');
+          }
+        },
+        error: function () {
+          showToast('Có lỗi xảy ra khi gửi dữ liệu!', 'error');
+        }
+      });
+    });
+  });
+</script>

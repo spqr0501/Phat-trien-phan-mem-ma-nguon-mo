@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FAQ - Compatibility & Bảo Hành | PCTech Store</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+        }
+
+        header {
+            background: #1a1a1a;
+            color: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #logo p {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d4a373;
+            margin: 0;
+        }
+
+        .menu {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            margin: 0;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .menu a:hover {
+            color: #d4a373;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .faq-section {
+            margin-bottom: 50px;
+        }
+
+        .faq-title {
+            font-size: 32px;
+            color: #1e3c72;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: #f8f9fa;
+        }
+
+        .faq-question i {
+            color: #1e3c72;
+            transition: transform 0.3s;
+        }
+
+        .faq-answer {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .faq-answer.active {
+            padding: 20px 25px;
+            max-height: 2000px;
+        }
+
+        .faq-answer p {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .faq-answer strong {
+            color: #333;
+        }
+
+        .faq-answer table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .faq-answer th,
+        .faq-answer td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .faq-answer th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .faq-answer ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .faq-answer li {
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div id="logo">
+            <p>PCTECH STORE</p>
+        </div>
+
+        <nav id="hnav">
+            <ul class="menu">
+                <li><a href="/">TRANG CHỦ</a></li>
+                <li><a href="/shop">SẢN PHẨM</a></li>
+                <li><a href="/#about">GIỚI THIỆU</a></li>
+                <li><a href="/#contact">LIÊN HỆ</a></li>
+            </ul>
+        </nav>
+
+        <div class="user-menu">
+            <a href="/cart" style="color:white; text-decoration:none; position:relative;">
+                <i class="fas fa-shopping-cart" style="font-size:20px;"></i>
+                <span th:if="${session.cart != null and session.cart.size() > 0}"
+                    style="position:absolute; top:-8px; right:-10px; background:#e74c3c; color:white; border-radius:50%; padding:2px 6px; font-size:12px;"
+                    th:text="${session.cart.size()}">0</span>
+            </a>
+
+            <div sec:authorize="hasRole('ADMIN')">
+                <a href="/admin" class="admin-btn"
+                    style="background:#d4a373; color:white; padding:8px 16px; border-radius:5px; text-decoration:none; font-weight:bold;">Quản
+                    trị</a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()">
+                <span sec:authentication="principal.hoten">User</span>
+            </div>
+
+            <div sec:authorize="isAnonymous()">
+                <a href="/login" style="color:white; text-decoration:none;">ĐĂNG NHẬP</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 style="font-size: 36px; margin-bottom: 10px; text-align: center;">Câu Hỏi Thường Gặp</h2>
+        <p style="color: #666; font-size: 18px; margin-bottom: 40px; text-align: center;">Tất cả thông tin về
+            compatibility và bảo hành</p>
+
+        <!-- Compatibility Section -->
+        <div class="faq-section">
+            <h3 class="faq-title"><i class="fas fa-puzzle-piece"></i> Compatibility (Tương thích linh kiện)</h3>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    RAM DDR4 có tương thích với mainboard DDR5 không?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>Không.</strong> DDR4 và DDR5 có notch (khấc) khác nhau và không thể cắm vào nhau. Bạn
+                        phải chọn mainboard hỗ trợ loại RAM tương ứng.</p>
+                    <div class="warning">
+                        <strong>⚠️ Lưu ý:</strong>
+                        <ul>
+                            <li>Intel Gen 12/13 có mainboard hỗ trợ DDR4 HOẶC DDR5 (không phải cả 2 cùng lúc)</li>
+                            <li>Intel Gen 14, AMD Ryzen 7000 chỉ hỗ trợ DDR5</li>
+                            <li>AMD Ryzen 5000 và cũ hơn chỉ hỗ trợ DDR4</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    GPU NVIDIA có dùng được với CPU AMD không?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>Có, hoàn toàn được!</strong> GPU không phụ thuộc vào hãng CPU.</p>
+                    <div class="success">
+                        <strong>✅ Tất cả combination sau đều OK:</strong>
+                        <ul>
+                            <li>AMD CPU + NVIDIA GPU</li>
+                            <li>Intel CPU + AMD GPU</li>
+                            <li>Bất kỳ combination nào</li>
+                        </ul>
+                        <p>Chỉ cần mainboard có slot PCIe x16.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    PSU bao nhiêu Watt là đủ cho build của tôi?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>Power requirement theo GPU:</strong></p>
+                    <table>
+                        <tr>
+                            <th>GPU</th>
+                            <th>PSU Recommended</th>
+                        </tr>
+                        <tr>
+                            <td>RTX 4090</td>
+                            <td>850W+ (1000W lý tưởng)</td>
+                        </tr>
+                        <tr>
+                            <td>RTX 4080 SUPER</td>
+                            <td>750W+</td>
+                        </tr>
+                        <tr>
+                            <td>RTX 4070 Ti</td>
+                            <td>700W+</td>
+                        </tr>
+                        <tr>
+                            <td>RTX 4060 Ti</td>
+                            <td>550W+</td>
+                        </tr>
+                        <tr>
+                            <td>RX 7900 XTX</td>
+                            <td>800W+</td>
+                        </tr>
+                    </table>
+                    <div class="highlight">
+                        <strong>💡 Công thức tính:</strong><br>
+                        TDP CPU + TDP GPU + 150W (cho phần còn lại) = Minimum PSU
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    Tôi nên chọn bao nhiêu RAM cho gaming?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <table>
+                        <tr>
+                            <th>Use Case</th>
+                            <th>RAM Recommended</th>
+                        </tr>
+                        <tr>
+                            <td>Office, Browse</td>
+                            <td>8GB</td>
+                        </tr>
+                        <tr>
+                            <td>1080p Gaming</td>
+                            <td>16GB</td>
+                        </tr>
+                        <tr>
+                            <td>1440p/4K Gaming</td>
+                            <td>16-32GB</td>
+                        </tr>
+                        <tr>
+                            <td>Streaming + Gaming</td>
+                            <td>32GB</td>
+                        </tr>
+                        <tr>
+                            <td>Content Creation</td>
+                            <td>32-64GB</td>
+                        </tr>
+                        <tr>
+                            <td>Workstation (3D, VFX)</td>
+                            <td>64-128GB</td>
+                        </tr>
+                    </table>
+                    <p><strong>2024 standard:</strong> 16GB minimum, 32GB recommended</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    SSD NVMe Gen 4 có work với mainboard Gen 3 không?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>Có, backward compatible.</strong> SSD sẽ chạy ở tốc độ Gen 3 (3500 MB/s thay vì 7000
+                        MB/s).</p>
+                    <p><strong>Ngược lại:</strong> SSD Gen 3 cũng work trên mainboard Gen 4, chỉ chạy ở tốc độ Gen 3.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warranty Section -->
+        <div class="faq-section">
+            <h3 class="faq-title"><i class="fas fa-shield-alt"></i> Bảo Hành</h3>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    Thời gian bảo hành của từng linh kiện là bao lâu?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <table>
+                        <tr>
+                            <th>Component</th>
+                            <th>Warranty Period</th>
+                        </tr>
+                        <tr>
+                            <td>CPU Intel/AMD</td>
+                            <td>3 năm</td>
+                        </tr>
+                        <tr>
+                            <td>GPU (ASUS, MSI, Gigabyte)</td>
+                            <td>3 năm</td>
+                        </tr>
+                        <tr>
+                            <td>RAM</td>
+                            <td>Lifetime / 10 năm</td>
+                        </tr>
+                        <tr>
+                            <td>SSD (Samsung, WD)</td>
+                            <td>5 năm</td>
+                        </tr>
+                        <tr>
+                            <td>Mainboard</td>
+                            <td>3 năm</td>
+                        </tr>
+                        <tr>
+                            <td>PSU 80+ Gold</td>
+                            <td>5-7 năm</td>
+                        </tr>
+                        <tr>
+                            <td>PSU 80+ Platinum</td>
+                            <td>10 năm</td>
+                        </tr>
+                        <tr>
+                            <td>Case</td>
+                            <td>1 năm - Lifetime</td>
+                        </tr>
+                        <tr>
+                            <td>AIO Cooling</td>
+                            <td>2-6 năm</td>
+                        </tr>
+                    </table>
+                    <div class="success">
+                        <strong>✅ Bonus từ PCTech:</strong> Đổi 1-1 trong 7 ngày đầu nếu phát hiện lỗi!
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    Quy trình bảo hành như thế nào?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>5 bước đơn giản:</strong></p>
+                    <ol>
+                        <li><strong>Liên hệ PCTech</strong> qua Hotline/Facebook/Zalo</li>
+                        <li><strong>Troubleshoot</strong> với kỹ thuật viên (có thể fix remote)</li>
+                        <li><strong>Mang linh kiện</strong> đến shop (hoặc ship COD)</li>
+                        <li><strong>Kiểm tra</strong> và xác định lỗi (1-2 giờ)</li>
+                        <li><strong>Sửa/Đổi/Trả</strong> trong 24-48 giờ</li>
+                    </ol>
+                    <p><strong>Nếu chờ hãng:</strong> 7-15 ngày (chúng tôi cho mượn linh kiện thay thế nếu có)</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    Bảo hành có cover physical damage không?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>Không.</strong></p>
+                    <div class="warning">
+                        <strong>❌ Bảo hành KHÔNG cover:</strong>
+                        <ul>
+                            <li>Rơi vỡ, va đập</li>
+                            <li>Vào nước</li>
+                            <li>Cháy do sét đánh, nguồn kém chất lượng</li>
+                            <li>Overclock quá mức (burned CPU/GPU)</li>
+                            <li>Bong tem bảo hành, tự sửa</li>
+                        </ul>
+                    </div>
+                    <div class="success">
+                        <strong>✅ Bảo hành COVER:</strong>
+                        <ul>
+                            <li>Lỗi nhà sản xuất</li>
+                            <li>Hỏng do sử dụng bình thường</li>
+                            <li>Lỗi firmware, BIOS</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    Shop có return policy không? Đổi ý có được trả không?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>Có, trong 7 ngày!</strong></p>
+                    <p><strong>Điều kiện đổi trả:</strong></p>
+                    <ul>
+                        <li>Sản phẩm chưa qua sử dụng (seal nguyên)</li>
+                        <li>Đầy đủ hộp, phụ kiện</li>
+                        <li>Không có vết xước, trầy</li>
+                        <li>Có hóa đơn mua hàng</li>
+                    </ul>
+                    <p><strong>Chính sách:</strong></p>
+                    <ul>
+                        <li><strong>Hoàn tiền 100%</strong> (trừ 3% phí giao dịch)</li>
+                        <li><strong>Đổi sang sản phẩm khác</strong> (miễn phí)</li>
+                        <li><strong>Upgrade lên đắt hơn</strong> (đóng tiền chênh lệch)</li>
+                    </ul>
+                    <div class="warning">
+                        <strong>⚠️ Ngoại lệ:</strong> CPU, Mainboard đã mở seal không được trả (chỉ được đổi sang model
+                        khác)
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFAQ(this)">
+                    Build PC có bảo hành tổng thể không?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>Có!</strong> Nếu build PC tại PCTech (hoặc mua full build):</p>
+                    <ul>
+                        <li><strong>6 tháng</strong> bảo hành TOÀN BỘ build (phối hợp hoạt động cùng nhau)</li>
+                        <li><strong>FREE troubleshooting</strong> nếu có conflict giữa các linh kiện</li>
+                        <li>Priority support qua hotline</li>
+                    </ul>
+                    <p><strong>Sau 6 tháng:</strong> Bảo hành từng linh kiện theo chính sách hãng.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Support -->
+        <div
+            style="text-align: center; padding: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white; margin-top: 60px;">
+            <h3 style="font-size: 28px; margin-bottom: 15px;">Vẫn Còn Thắc Mắc?</h3>
+            <p style="font-size: 18px; margin-bottom: 25px;">Liên hệ với chúng tôi để được tư vấn chi tiết!</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="tel:0901234567"
+                    style="display: inline-block; background: white; color: #667eea; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+                    <i class="fas fa-phone"></i> 0901 234 567
+                </a>
+                <a href="mailto:support@pctech.vn"
+                    style="display: inline-block; background: white; color: #667eea; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+                    <i class="fas fa-envelope"></i> support@pctech.vn
+                </a>
+                <a href="https://zalo.me/0901234567"
+                    style="display: inline-block; background: #0068ff; color: white; padding: 15px 30px; border-radius: 8px; text-decoration: none; font-weight: 700;">
+                    <i class="fab fa-zalo"></i> Chat Zalo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <h4>© 2025 PCTech Store - Linh kiện máy tính chính hãng</h4>
+        <p>📍 123 Đường Nguyễn Huệ, Quận 1, TP.HCM | ☎️ 0901 234 567</p>
+    </footer>
+
+    <script>
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('i');
+
+            // Close all other FAQs
+            document.querySelectorAll('.faq-answer').forEach(item => {
+                if (item !== answer) {
+                    item.classList.remove('active');
+                }
+            });
+            document.querySelectorAll('.faq-question i').forEach(item => {
+                if (item !== icon) {
+                    item.style.transform = 'rotate(0deg)';
+                }
+            });
+
+            // Toggle current FAQ
+            answer.classList.toggle('active');
+            icon.style.transform = answer.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    </script>
+
+</body>
+
+</html>

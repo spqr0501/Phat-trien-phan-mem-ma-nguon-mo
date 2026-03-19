@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Đặt hàng thành công - PCTech Store</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-container {
+            max-width: 600px;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .success-icon i {
+            font-size: 60px;
+            color: white;
+        }
+
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .order-info {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .order-info h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .order-number {
+            font-size: 32px;
+            color: #d4a373;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: #d4a373;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            border-color: #d4a373;
+            color: #d4a373;
+        }
+
+        .features {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feature {
+            padding: 20px;
+        }
+
+        .feature i {
+            font-size: 32px;
+            color: #d4a373;
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <h1>Đặt hàng thành công!</h1>
+        <p class="success-message">
+            Cảm ơn bạn đã tin tưởng và đặt hàng tại PCTech Store.<br>
+            Chúng tôi sẽ xử lý đơn hàng và liên hệ với bạn sớm nhất.
+        </p>
+
+        <div class="order-info" th:if="${orderId}">
+            <h3>Mã đơn hàng của bạn</h3>
+            <div class="order-number" th:text="'#' + ${orderId}">#12345</div>
+            <p style="color: #999; margin-top: 10px; font-size: 14px;">
+                Vui lòng lưu lại mã đơn hàng để tra cứu
+            </p>
+        </div>
+
+        <div class="actions">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Về trang chủ
+            </a>
+            <a href="/shop" class="btn btn-secondary">
+                <i class="fas fa-shopping-bag"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-shipping-fast"></i>
+                <p>Giao hàng nhanh chóng</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <p>Thanh toán an toàn</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-headset"></i>
+                <p>Hỗ trợ 24/7</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

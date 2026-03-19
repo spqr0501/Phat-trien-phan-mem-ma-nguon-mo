@@ -1,0 +1,90 @@
+<!-- add-customer.html (updated with AJAX script) -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Quản lý khách hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 th:text="${title}">Thêm khách hàng</h2>
+
+    <!-- Thông báo thành công / lỗi -->
+    <div th:if="${msg}" class="alert alert-success alert-dismissible fade show">
+        <span th:text="${msg}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form th:action="${action}" th:object="${customer}" method="post" class="row g-3">
+
+        <div class="col-md-6">
+            <label class="form-label">Mã khách hàng</label>
+            <input type="text" class="form-control" th:field="*{makh}"
+                   required maxlength="10"
+                   th:readonly="${action.contains('update')} ? true : false"/>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Tên khách hàng</label>
+            <input type="text" class="form-control" th:field="*{tenkh}" required/>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Địa chỉ</label>
+            <input type="text" class="form-control" th:field="*{diachi}" required/>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Số điện thoại</label>
+            <input type="text" class="form-control" th:field="*{sdt}" required/>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" th:field="*{email}" required/>
+        </div>
+
+        <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-primary">Lưu lại</button>
+            <a th:href="@{/admin/customer}" class="btn btn-secondary ms-2">Quay lại danh sách</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('form').on('submit', function(e) {
+        e.preventDefault();
+       
+        var formData = new FormData(this);
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(res) {
+                if (res.success) {
+                    alert(res.message);
+                    loadContent('/admin/customer'); // reload lại danh sách
+                } else {
+                    alert('Lỗi: ' + res.message);
+                }
+            },
+            error: function() {
+                alert('Có lỗi xảy ra khi gửi dữ liệu!');
+            }
+        });
+    });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

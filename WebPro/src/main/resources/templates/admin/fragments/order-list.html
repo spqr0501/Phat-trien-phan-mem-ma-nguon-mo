@@ -1,0 +1,50 @@
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Danh sách đơn hàng</h3>
+        <div class="box-tools">
+            <div class="input-group input-group-sm" style="width: 150px;">
+                <input type="text" name="table_search" class="form-control pull-right" placeholder="Tìm kiếm">
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box-body table-responsive no-padding">
+        <table class="table table-hover">
+            <tbody>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+                <tr th:each="order : ${orders}">
+                    <td th:text="'#' + ${order.orderId}">#123</td>
+                    <td>
+                        <div th:text="${order.customerName}">Nguyễn Văn A</div>
+                        <small th:text="${order.userId}">user123</small>
+                    </td>
+                    <td th:text="${#temporals.format(order.createdDate, 'dd/MM/yyyy HH:mm')}">11-7-2014</td>
+                    <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">100.000 ₫
+                    </td>
+                    <td>
+                        <span th:class="${'label ' + (order.status == 'Pending' ? 'label-warning' : 
+                                            (order.status == 'Processing' ? 'label-primary' : 
+                                            (order.status == 'Shipping' ? 'label-info' : 
+                                            (order.status == 'Completed' ? 'label-success' : 'label-danger'))))}"
+                            th:text="${order.status}">Pending</span>
+                    </td>
+                    <td>
+                        <a href="#" th:data-url="@{/admin/orders/{id}(id=${order.orderId})}"
+                            class="btn btn-sm btn-primary load-content">
+                            <i class="fa fa-eye"></i> Xem
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

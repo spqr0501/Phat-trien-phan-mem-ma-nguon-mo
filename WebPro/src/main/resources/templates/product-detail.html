@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${product.tenhh}">Product Detail</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+        }
+
+        header {
+            background: #1a1a1a;
+            color: white;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #logo p {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d4a373;
+        }
+
+        .menu {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .menu a:hover {
+            color: #d4a373;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Header helpers (copied/normalized from other pages) */
+        #darkModeToggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .header-search {
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
+        }
+
+        .header-search input {
+            padding: 8px 15px;
+            border: 2px solid #444;
+            border-radius: 25px 0 0 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 250px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .header-search input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .header-search input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #d4a373;
+            width: 300px;
+        }
+
+        .header-search button {
+            padding: 8px 20px;
+            border: 2px solid #d4a373;
+            border-left: none;
+            border-radius: 0 25px 25px 0;
+            background: #d4a373;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .header-search button:hover {
+            background: #c89563;
+            border-color: #c89563;
+        }
+
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-icon a {
+            color: white;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: #e74c3c;
+            color: white;
+            font-size: 11px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .admin-btn {
+            background: linear-gradient(135deg, #d4a373 0%, #c89968 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(212, 163, 115, 0.3);
+            transition: all 0.3s;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 163, 115, 0.4);
+        }
+
+        .breadcrumb {
+            background: white;
+            padding: 15px 50px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .breadcrumb a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #d4a373;
+        }
+
+        .breadcrumb span {
+            color: #999;
+            margin: 0 10px;
+        }
+
+        .product-detail {
+            max-width: 1400px;
+            margin: 50px auto;
+            padding: 0 50px;
+        }
+
+        .product-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-info h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .product-code {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .price-section {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .current-price {
+            font-size: 42px;
+            color: #d4a373;
+            font-weight: bold;
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .discount-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .product-description {
+            margin: 30px 0;
+            line-height: 1.8;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .add-to-cart-section {
+            margin: 30px 0;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quantity-selector label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .quantity-selector input {
+            width: 80px;
+            padding: 10px;
+            font-size: 18px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .btn-add-cart {
+            background: #d4a373;
+            color: white;
+            border: none;
+            padding: 18px 60px;
+            font-size: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-add-cart:hover {
+            background: #333;
+            transform: scale(1.05);
+        }
+
+        .product-specs {
+            margin: 30px 0;
+        }
+
+        .product-specs h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .spec-table {
+            width: 100%;
+        }
+
+        .spec-table tr {
+            border-bottom: 1px solid #eee;
+        }
+
+        .spec-table td {
+            padding: 12px 0;
+        }
+
+        .spec-table td:first-child {
+            font-weight: bold;
+            color: #666;
+            width: 150px;
+        }
+
+        .related-products {
+            margin: 80px 0;
+        }
+
+        .related-products h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .product-card-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .product-card-info h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-card-info .price {
+            color: #d4a373;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div id="logo">
+            <p>PCTECH STORE</p>
+        </div>
+
+        <nav id="hnav">
+            <ul class="menu">
+                <li><a href="/">TRANG CHỦ</a></li>
+                <li><a href="/shop">SẢN PHẨM</a></li>
+                <li><a href="/cart">GIỎ HÀNG</a></li>
+                <li sec:authorize="isAuthenticated()"><a href="/wishlist">WISHLIST</a></li>
+                <li sec:authorize="isAuthenticated()"><a href="/orders/history">ĐƠN HÀNG</a></li>
+                <li><a href="/#about">GIỚI THIỆU</a></li>
+                <li><a href="/#contact">LIÊN HỆ</a></li>
+            </ul>
+
+            <!-- Search Form -->
+            <form action="/search" method="get" class="header-search">
+                <input type="text" name="keyword" placeholder="Tìm kiếm sản phẩm..." required>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </nav>
+
+        <div class="user-menu">
+            <!-- Dark Mode Toggle -->
+            <button id="darkModeToggle" title="Chế độ tối">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <div class="cart-icon">
+                <a th:href="@{/cart}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge" th:text="${session.cart != null ? session.cart.size() : 0}">0</span>
+                </a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()">
+                <a href="/profile"
+                    style="color: white; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()" style="color: #d4a373;">
+                <i class="fas fa-user"></i> <span sec:authentication="principal.hoten">User</span>
+            </div>
+
+            <div sec:authorize="hasRole('ADMIN')">
+                <a href="/admin" class="admin-btn">Quản trị</a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()">
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit"
+                        style="background:none;border:none;color:white;cursor:pointer;font-size:14px;">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </button>
+                </form>
+            </div>
+
+            <div sec:authorize="isAnonymous()">
+                <a href="/login" style="color:white; text-decoration:none;font-weight:500;">
+                    <i class="fas fa-sign-in-alt"></i> ĐĂNG NHẬP
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="/">Trang chủ</a> <span>/</span>
+        <a href="/shop">Sản phẩm</a> <span>/</span>
+        <strong th:text="${product.tenhh}">Product Name</strong>
+    </div>
+
+    <div class="product-detail">
+        <div class="product-main">
+            <div class="product-image">
+                <img th:src="@{'/Images/' + ${product.hinh} + '?_t=' + ${#dates.createNow().time}}" th:alt="${product.tenhh}">
+            </div>
+
+            <div class="product-info">
+                <h1 th:text="${product.tenhh}">Product Name</h1>
+                <p class="product-code">Mã sản phẩm: <strong th:text="${product.mahh}">XXX</strong></p>
+
+                <div class="price-section">
+                    <div th:if="${product.giamgia > 0}">
+                        <span class="old-price"
+                            th:text="'₫' + ${#numbers.formatInteger(product.dongia, 0, 'DEFAULT')}">0₫</span>
+                        <span class="discount-badge" th:text="'-' + ${product.phanTramGiam} + '%'">-20%</span>
+                        <div class="current-price"
+                            th:text="'₫' + ${#numbers.formatInteger(product.giaHienTai, 0, 'DEFAULT')}">0₫</div>
+                    </div>
+                    <div th:unless="${product.giamgia > 0}">
+                        <div class="current-price"
+                            th:text="'₫' + ${#numbers.formatInteger(product.dongia, 0, 'DEFAULT')}">0₫</div>
+                    </div>
+                </div>
+
+                <div class="product-description" th:if="${product.mota != null and not #strings.isEmpty(product.mota)}">
+                    <h3>Mô tả sản phẩm</h3>
+                    <p th:utext="${product.mota}">Description</p>
+                </div>
+
+                <div class="product-specs">
+                    <h3>Thông tin sản phẩm</h3>
+                    <table class="spec-table">
+                        <tr th:if="${product.xuatxu != null and not #strings.isEmpty(product.xuatxu)}">
+                            <td>Xuất xứ:</td>
+                            <td th:text="${product.xuatxu}">Vietnam</td>
+                        </tr>
+                        <tr>
+                            <td>Trạng thái:</td>
+                            <td>
+                                <span th:if="${product.xuhuong}">🔥 Xu hướng &nbsp;</span>
+                                <span th:if="${product.phobien}">⭐ Phổ biến</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="add-to-cart-section">
+                    <input type="hidden" id="product-id" th:value="${product.mahh}">
+                    <div class="quantity-selector">
+                        <label>Số lượng:</label>
+                        <input type="number" id="product-qty" value="1" min="1" max="99">
+                    </div>
+                    <button type="button" class="btn-add-cart" onclick="addToCartDetail()">
+                        <i class="fas fa-shopping-cart"></i> THÊM VÀO GIỎ HÀNG
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-section"
+            style="max-width: 1200px; margin: 50px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+            <h2 style="font-size: 28px; margin-bottom: 30px; color: #1a1a1a;">Đánh giá sản phẩm</h2>
+
+            <!-- Rating Summary -->
+            <div
+                style="display: flex; align-items: center; gap: 30px; margin-bottom: 40px; padding: 25px; background: #f8f9fa; border-radius: 10px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 48px; font-weight: bold; color: #d4a373;"
+                        th:text="${product.averageRating != null ? #numbers.formatDecimal(product.averageRating, 1, 1) : '0.0'}">
+                        0.0</div>
+                    <div class="stars" style="color: #ffc107; font-size: 24px; margin: 10px 0;">
+                        <i class="fas fa-star"
+                            th:if="${product.averageRating != null and product.averageRating >= 1}"></i>
+                        <i class="far fa-star" th:unless="${product.averageRating >= 1}"></i>
+                        <i class="fas fa-star"
+                            th:if="${product.averageRating != null and product.averageRating >= 2}"></i>
+                        <i class="far fa-star" th:unless="${product.averageRating >= 2}"></i>
+                        <i class="fas fa-star"
+                            th:if="${product.averageRating != null and product.averageRating >= 3}"></i>
+                        <i class="far fa-star" th:unless="${product.averageRating >= 3}"></i>
+                        <i class="fas fa-star"
+                            th:if="${product.averageRating != null and product.averageRating >= 4}"></i>
+                        <i class="far fa-star" th:unless="${product.averageRating >= 4}"></i>
+                        <i class="fas fa-star"
+                            th:if="${product.averageRating != null and product.averageRating >= 5}"></i>
+                        <i class="far fa-star" th:unless="${product.averageRating >= 5}"></i>
+                    </div>
+                    <div style="color: #666; font-size: 14px;">
+                        <span th:text="${product.reviewCount != null ? product.reviewCount : 0}">0</span> đánh giá
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Review Form (for authenticated users) -->
+            <div sec:authorize="isAuthenticated()"
+                style="margin-bottom: 40px; padding: 25px; background: #f8f9fa; border-radius: 10px;">
+                <h3 style="margin-bottom: 20px; color: #1a1a1a;">Viết đánh giá của bạn</h3>
+                <form id="reviewForm" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 10px; font-weight: 500;">Đánh giá:</label>
+                        <div class="rating-input" style="display: flex; gap: 10px; font-size: 30px;">
+                            <i class="far fa-star" data-rating="1" onclick="setRating(1)"
+                                style="cursor: pointer; color: #ddd;"></i>
+                            <i class="far fa-star" data-rating="2" onclick="setRating(2)"
+                                style="cursor: pointer; color: #ddd;"></i>
+                            <i class="far fa-star" data-rating="3" onclick="setRating(3)"
+                                style="cursor: pointer; color: #ddd;"></i>
+                            <i class="far fa-star" data-rating="4" onclick="setRating(4)"
+                                style="cursor: pointer; color: #ddd;"></i>
+                            <i class="far fa-star" data-rating="5" onclick="setRating(5)"
+                                style="cursor: pointer; color: #ddd;"></i>
+                        </div>
+                        <input type="hidden" id="ratingValue" value="0">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 10px; font-weight: 500;">Nội dung đánh giá:</label>
+                        <textarea id="reviewComment" rows="4" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+                            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; resize: vertical;"></textarea>
+                    </div>
+                    <button type="button" onclick="submitReview()"
+                        style="align-self: flex-start; padding: 12px 30px; background: #d4a373; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                        Gửi đánh giá
+                    </button>
+                </form>
+            </div>
+
+            <!-- Reviews List -->
+            <div id="reviewsList" style="display: flex; flex-direction: column; gap: 20px;">
+                <h3 style="margin-bottom: 20px; color: #1a1a1a;">Tất cả đánh giá</h3>
+                <div class="review-item" style="padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+                    <p style="color: #999; font-style: italic; text-align: center; padding: 40px 0;">Chưa có đánh giá
+                        nào. Hãy là người đầu tiên đánh giá sản phẩm này!</p>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            let selectedRating = 0;
+            const PRODUCT_ID = /*[[${product.mahh}]]*/ '';
+
+            function setRating(rating) {
+                selectedRating = rating;
+                document.getElementById('ratingValue').value = rating;
+
+                // Update stars display
+                const stars = document.querySelectorAll('.rating-input i');
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.remove('far');
+                        star.classList.add('fas');
+                        star.style.color = '#ffc107';
+                    } else {
+                        star.classList.remove('fas');
+                        star.classList.add('far');
+                        star.style.color = '#ddd';
+                    }
+                });
+            }
+
+            function submitReview() {
+                const rating = document.getElementById('ratingValue').value;
+                const comment = document.getElementById('reviewComment').value;
+
+                if (rating == 0) {
+                    alert('Vui lòng chọn số sao đánh giá!');
+                    return;
+                }
+
+                if (!comment.trim()) {
+                    alert('Vui lòng nhập nội dung đánh giá!');
+                    return;
+                }
+
+                fetch('/api/reviews/add?productId=' + PRODUCT_ID + '&rating=' + rating + '&comment=' + encodeURIComponent(comment), {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Đánh giá của bạn đã được gửi thành công!');
+                            location.reload();
+                        } else {
+                            alert('Có lỗi xảy ra: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Không thể gửi đánh giá. Vui lòng thử lại!');
+                    });
+            }
+
+            // Load reviews on page load
+            window.addEventListener('DOMContentLoaded', () => {
+                loadReviews();
+            });
+
+            function loadReviews() {
+                fetch('/api/reviews/product/' + PRODUCT_ID)
+                    .then(response => response.json())
+                    .then(reviews => {
+                        const reviewsList = document.getElementById('reviewsList');
+                        if (!reviews || reviews.length === 0) {
+                            return;
+                        }
+
+                        reviewsList.innerHTML = '<h3 style="margin-bottom: 20px; color: #1a1a1a;">Tất cả đánh giá (' + reviews.length + ')</h3>';
+
+                        reviews.forEach(review => {
+                            const filledStars = '★'.repeat(review.rating);
+                            const emptyStars = '☆'.repeat(5 - review.rating);
+                            const allStars = filledStars + emptyStars;
+                            const userName = review.userId || 'Ẩn danh';
+                            const dateStr = review.createdDate ? new Date(review.createdDate).toLocaleDateString('vi-VN') : '';
+                            const commentText = review.comment || '';
+
+                            const div = document.createElement('div');
+                            div.className = 'review-item';
+                            div.style.cssText = 'padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;';
+                            div.innerHTML = '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">'
+                                + '<div style="font-weight: 600; color: #1a1a1a;">' + userName + '</div>'
+                                + '<div style="color: #ffc107; font-size: 18px;">' + allStars + '</div>'
+                                + '</div>'
+                                + '<div style="color: #666; font-size: 14px; margin-bottom: 10px;">' + dateStr + '</div>'
+                                + '<div style="color: #333; line-height: 1.6;">' + commentText + '</div>';
+                            reviewsList.appendChild(div);
+                        });
+                    })
+                    .catch(error => console.error('Error loading reviews:', error));
+            }
+        </script>
+
+        <!-- Related Products -->
+        <div class="related-products" th:if="${!relatedProducts.isEmpty()}">
+            <h2>SẢN PHẨM LIÊN QUAN</h2>
+            <div class="product-grid">
+                <div th:each="p : ${relatedProducts}" class="product-card">
+                    <a th:href="@{/product/{id}(id=${p.mahh})}" style="text-decoration:none; color:inherit;">
+                        <img th:src="@{'/Images/' + ${p.hinh} + '?_t=' + ${#dates.createNow().time}}" th:alt="${p.tenhh}">
+                        <div class="product-card-info">
+                            <h3 th:text="${p.tenhh}">Product Name</h3>
+                            <div class="price" th:text="'₫' + ${#numbers.formatInteger(p.dongia, 0, 'DEFAULT')}">0₫
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <h4>© 2025 PCTech Store - Linh kiện máy tính chính hãng</h4>
+    </footer>
+
+    <script>
+        function addToCartDetail() {
+            const mahh = document.getElementById('product-id').value;
+            const quantity = document.getElementById('product-qty').value;
+
+            const formData = new FormData();
+            formData.append('mahh', mahh);
+            formData.append('quantity', quantity);
+
+            fetch('/add-to-cart', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart badge if exists
+                    const badges = document.querySelectorAll('.cart-badge, [class*="cart"] span');
+                    badges.forEach(badge => {
+                        badge.textContent = data.cartSize;
+                    });
+
+                    // Show toast
+                    showToast('✓ ' + data.message);
+                } else {
+                    showToast(data.message || 'Lỗi!', true);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra!', true);
+            });
+        }
+
+        function showToast(message, isError) {
+            // Remove old toast
+            const old = document.getElementById('cart-toast');
+            if (old) old.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'cart-toast';
+            toast.textContent = message;
+            toast.style.cssText = 'position:fixed; bottom:30px; right:30px; background:' +
+                (isError ? '#e74c3c' : '#2ecc71') +
+                '; color:white; padding:16px 28px; border-radius:10px; font-weight:600; z-index:9999; box-shadow:0 5px 20px rgba(0,0,0,0.3); animation:slideIn 0.3s;';
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+    <script src="/js/global.js" defer></script>
+</body>
+
+</html>

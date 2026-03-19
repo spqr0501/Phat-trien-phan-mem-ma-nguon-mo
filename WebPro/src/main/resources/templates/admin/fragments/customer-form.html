@@ -1,0 +1,91 @@
+<!-- customer-form.html - FIXED: Using form ID and proper script initialization -->
+<div class="box" th:fragment="content">
+  <div class="box-header with-border">
+    <h3 class="box-title" th:text="${title}">Thêm khách hàng</h3>
+  </div>
+  <div class="box-body">
+    <div th:if="${msg}" class="alert alert-success alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <span th:text="${msg}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <span th:text="${error}"></span>
+    </div>
+
+    <form th:action="${action}" th:object="${customer}" method="post" class="form-horizontal" id="customerForm">
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Mã khách hàng <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" th:field="*{makh}" required
+            th:readonly="${action?.contains('update')}" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Tên khách hàng <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" th:field="*{tenkh}" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Địa chỉ</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" th:field="*{diachi}" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Số điện thoại</label>
+        <div class="col-sm-9">
+          <input type="tel" class="form-control" th:field="*{sdt}" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-3 control-label">Email</label>
+        <div class="col-sm-9">
+          <input type="email" class="form-control" th:field="*{email}" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-9">
+          <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Lưu lại</button>
+          <button type="button" class="btn btn-default" onclick="loadContent('/admin/customer')"><i
+              class="fa fa-times"></i> Hủy</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  $(function () {
+    $('#customerForm').on('submit', function (e) {
+      e.preventDefault();
+      var fd = new FormData(this);
+      $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: fd,
+        contentType: false,
+        processData: false,
+        success: function (r) {
+          if (r.success) {
+            showToast(r.message, 'success');
+            setTimeout(function () {
+              loadContent('/admin/customer');
+            }, 1000);
+          } else {
+            showToast(r.message, 'error');
+          }
+        },
+        error: function () {
+          showToast('Lỗi hệ thống!', 'error');
+        }
+      });
+    });
+  });
+</script>

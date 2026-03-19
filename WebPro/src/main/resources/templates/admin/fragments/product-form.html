@@ -1,0 +1,179 @@
+<!-- admin/fragments/product-form.html - Fixed duplicate mahh field -->
+<div class="box" th:fragment="content">
+  <div class="box-header with-border">
+    <h3 class="box-title" th:text="${title}">Thêm sản phẩm mới</h3>
+  </div>
+  <div class="box-body">
+
+    <div th:if="${msg}" class="alert alert-success alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <span th:text="${msg}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <span th:text="${error}"></span>
+    </div>
+
+    <form th:action="${action}" th:object="${product}" method="post" enctype="multipart/form-data"
+      class="form-horizontal" id="productForm">
+
+      <!-- Chỉ có 1 field mahh duy nhất -->
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Mã hàng <span class="text-red">*</span></label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" th:field="*{mahh}" required
+            th:readonly="${action?.contains('update')}" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Tên hàng <span class="text-red">*</span></label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" th:field="*{tenhh}" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Đơn giá <span class="text-red">*</span></label>
+        <div class="col-sm-10">
+          <input type="number" class="form-control" th:field="*{dongia}" min="0" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Giảm giá</label>
+        <div class="col-sm-10">
+          <input type="number" class="form-control" th:field="*{giamgia}" min="0" value="0" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Xuất xứ</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" th:field="*{xuatxu}" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Loại hàng <span class="text-red">*</span></label>
+        <div class="col-sm-10">
+          <select class="form-control" th:field="*{loaihh}" required>
+            <option value="">-- Chọn loại --</option>
+            <option th:each="cat : ${categories}" th:value="${cat.maloai}" th:text="${cat.tenloai}"></option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Hình ảnh</label>
+        <div class="col-sm-10">
+          <input type="file" name="filename" accept="image/*" class="form-control" />
+          <input type="hidden" name="oldImage" th:value="*{hinh}" />
+          <div th:if="*{hinh}">
+            <img th:src="@{'/Images/' + *{hinh} + '?_t=' + ${#dates.createNow().time}}" width="120" class="img-thumbnail mt-2" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Mô tả</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" th:field="*{mota}" rows="4"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Số lượng tồn kho</label>
+        <div class="col-sm-10">
+          <input type="number" class="form-control" th:field="*{soluong}" min="0" step="1" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <label><input type="checkbox" th:field="*{xuhuong}" value="1" /> Xu hướng</label>
+          &nbsp;&nbsp;&nbsp;
+          <label><input type="checkbox" th:field="*{phobien}" value="1" /> Phổ biến</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Lưu lại</button>
+          <button type="button" class="btn btn-default" onclick="loadContent('/admin/product')"><i
+              class="fa fa-times"></i> Hủy</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Use event delegation since form is loaded via AJAX
+  $(document).on('submit', '#productForm', function (e) {
+    e.preventDefault();
+
+    // Create FormData
+    var fd = new FormData(this);
+
+    // MANUAL FIX: Forcefully grab the file from input and append/replace in FormData
+    // This ensures that even if standard serialization fails, we get the file
+    var fileInput = $(this).find('input[name="filename"]')[0];
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      console.log('Manually checking file input: found ' + fileInput.files[0].name);
+      // Ensure 'filename' key has the file
+      fd.set('filename', fileInput.files[0]);
+    } else {
+      console.log('Manually checking file input: NO FILE SELECTED');
+    }
+
+    // DEBUG: Log FormData contents carefully
+    console.log('=== FormData Contents (Final Check) ===');
+    var fileFound = false;
+    for (var pair of fd.entries()) {
+      if (pair[1] instanceof File) {
+        console.log(pair[0] + ': ' + pair[1].name + ' (' + pair[1].size + ' bytes)');
+        if (pair[1].size > 0) fileFound = true;
+      } else {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+    }
+    console.log('File found in FormData: ' + fileFound);
+    console.log('========================================');
+
+    $.ajax({
+      url: $(this).attr('action'),
+      type: 'POST',
+      data: fd,
+      contentType: false,
+      processData: false,
+      cache: false,
+      success: function (r) {
+        if (r.success) {
+          if (typeof showToast === 'function') {
+            showToast(r.message, 'success');
+          } else {
+            alert(r.message);
+          }
+          setTimeout(function () {
+            loadContent('/admin/product');
+          }, 1000);
+        } else {
+          if (typeof showToast === 'function') {
+            showToast(r.message, 'error');
+          } else {
+            alert(r.message);
+          }
+        }
+      },
+      error: function (xhr) {
+        console.error('Upload error:', xhr);
+        if (typeof showToast === 'function') {
+          showToast('Lỗi hệ thống! ' + xhr.statusText, 'error');
+        } else {
+          alert('Lỗi hệ thống! ' + xhr.statusText);
+        }
+      }
+    });
+  });
+</script>

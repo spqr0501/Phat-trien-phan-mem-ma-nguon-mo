@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Thêm sản phẩm</title>
+</head>
+
+<body>
+
+    <!-- QUAN TRỌNG: fragment tên "content" -->
+    <div th:fragment="content" class="box">
+        <div class="box-header with-border">
+            <h3 class="box-title" th:text="${title}">Thêm sản phẩm mới</h3>
+        </div>
+        <div class="box-body">
+
+            <div th:if="${msg}" class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <span th:text="${msg}"></span>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <span th:text="${error}"></span>
+            </div>
+
+            <form th:action="${action}" th:object="${product}" method="post" enctype="multipart/form-data"
+                class="form-horizontal">
+
+                <input type="hidden" th:field="*{mahh}" />
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Mã hàng *</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" th:field="*{mahh}" required
+                            th:readonly="${action?.contains('update')}" placeholder="VD: SP001" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Tên hàng *</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" th:field="*{tenhh}" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Đơn giá *</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" th:field="*{dongia}" min="0" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Xuất xứ</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" th:field="*{xuatxu}" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Loại hàng *</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" th:field="*{loaihh}" required>
+                            <option value="">-- Chọn loại --</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.maloai}" th:text="${cat.tenloai}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Hình ảnh</label>
+                    <div class="col-sm-10">
+                        <input type="file" name="filename" accept="image/*" class="form-control" />
+                        <input type="hidden" name="oldImage" th:value="*{hinh}" />
+                        <div th:if="*{hinh}">
+                            <img th:src="@{'/Images/' + *{hinh}}" width="120" class="img-thumbnail mt-2" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <label><input type="checkbox" th:field="*{xuhuong}" /> Xu hướng</label>
+                        &nbsp;&nbsp;&nbsp;
+                        <label><input type="checkbox" th:field="*{phobien}" /> Phổ biến</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-primary">Lưu lại</button>
+                        <button type="button" class="btn btn-default"
+                            onclick="loadContent('/admin/product')">Hủy</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function () {
+            $('form').on('submit', function (e) {
+                e.preventDefault();
+                var fd = new FormData(this);
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    cache: false,
+                    success: function (r) {
+                        alert(r.success ? r.message : 'Lỗi: ' + r.message);
+                        if (r.success) loadContent('/admin/product');
+                    },
+                    error: function () { alert('Lỗi hệ thống!'); }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

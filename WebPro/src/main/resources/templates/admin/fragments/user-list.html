@@ -1,0 +1,71 @@
+<!-- user-list.html (updated with toast for delete) -->
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Danh sách người dùng</h3>
+    <div class="box-tools">
+      <a href="#" class="btn btn-success btn-sm load-content" data-url="/admin/user-add">
+        <i class="fa fa-plus"></i> Thêm mới
+      </a>
+    </div>
+  </div>
+  <div class="box-body table-responsive no-padding">
+    <table class="table table-hover">
+      <tr>
+        <th>Tên đăng nhập</th>
+        <th>Họ tên</th>
+        <th>Email</th>
+        <th>Quyền</th>
+        <th style="width: 200px;">Hành động</th>
+      </tr>
+      <tr th:each="u : ${listUser}">
+        <td th:text="${u.tendangnhap}"></td>
+        <td th:text="${u.hoten}"></td>
+        <td th:text="${u.email}"></td>
+        <td>
+          <span th:if="${u.admin}" class="label label-danger">Admin</span>
+          <span th:unless="${u.admin}" class="label label-success">User</span>
+        </td>
+        <td>
+          <a href="#" class="btn btn-info btn-xs load-content"
+            th:data-url="@{'/admin/user/detail/' + ${u.tendangnhap}}">
+            <i class="fa fa-eye"></i> Chi tiết
+          </a>
+          <a href="#" class="btn btn-primary btn-xs load-content"
+            th:data-url="@{'/admin/user/edit/' + ${u.tendangnhap}}">
+            <i class="fa fa-edit"></i> Sửa
+          </a>
+          <a href="#" class="btn btn-danger btn-xs delete-btn"
+            th:data-url="@{'/admin/user/delete/' + ${u.tendangnhap}}">
+            <i class="fa fa-trash"></i> Xóa
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $('.delete-btn').on('click', function (e) {
+      e.preventDefault();
+      if (!confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+
+      var url = $(this).data('url');
+      $.get(url)
+        .done(function (res) {
+          // SỬ DỤNG TOAST thay vì alert
+          if (res.success) {
+            showToast(res.message, 'success');
+            setTimeout(function () {
+              loadContent('/admin/user');
+            }, 1000);
+          } else {
+            showToast(res.message, 'error');
+          }
+        })
+        .fail(function () {
+          showToast('Có lỗi xảy ra khi xóa!', 'error');
+        });
+    });
+  });
+</script>

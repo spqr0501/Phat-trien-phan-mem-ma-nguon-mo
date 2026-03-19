@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - PCTech Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px 50px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .admin-header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .admin-header-actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .admin-header-actions a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.14);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .admin-header-actions a:hover {
+            background: rgba(255, 255, 255, 0.22);
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .icon-blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .icon-green {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+            color: white;
+        }
+
+        .icon-orange {
+            background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+            color: white;
+        }
+
+        .icon-red {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        .tables-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .table-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .stock-badge {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .stock-low {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .stock-out {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        @media (max-width: 1024px) {
+
+            .charts-section,
+            .tables-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-header">
+        <h1><i class="fas fa-chart-line"></i> Admin Dashboard</h1>
+        <p>Tổng quan hệ thống PCTech Store</p>
+        <div class="admin-header-actions">
+            <a href="/"><i class="fas fa-home"></i> Trang chủ</a>
+            <a href="/admin"><i class="fas fa-arrow-left"></i> Quay về trang admin</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-value"
+                    th:text="${#numbers.formatDecimal(stats.totalRevenue, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</div>
+                <div class="stat-label">Tổng doanh thu</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-green">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-value" th:text="${stats.totalOrders}">0</div>
+                <div class="stat-label">Tổng đơn hàng</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-orange">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value" th:text="${stats.pendingOrders}">0</div>
+                <div class="stat-label">Đơn chờ xử lý</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-red">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="stat-value" th:text="${stats.totalProducts}">0</div>
+                <div class="stat-label">Tổng sản phẩm</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <h2><i class="fas fa-chart-bar"></i> Doanh thu theo tháng</h2>
+                <canvas id="revenueChart"></canvas>
+            </div>
+
+            <div class="chart-card">
+                <h2><i class="fas fa-chart-pie"></i> Trạng thái đơn hàng</h2>
+                <canvas id="orderStatusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tables Section -->
+        <div class="tables-section">
+            <!-- Top Products -->
+            <div class="table-card">
+                <h2><i class="fas fa-star"></i> Sản phẩm nổi bật</h2>
+                <table th:if="${!topProducts.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Đánh giá</th>
+                            <th>Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${topProducts}">
+                            <td th:text="${product.tenhh}">Product Name</td>
+                            <td th:text="${product.reviewCount} + ' reviews'">0 reviews</td>
+                            <td>
+                                <span style="color:#f39c12;">
+                                    <span
+                                        th:text="${#numbers.formatDecimal(product.averageRating, 1, 'POINT', 1, 'POINT')}">0.0</span>
+                                    <i class="fas fa-star"></i>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div th:if="${topProducts.isEmpty()}" class="empty-state">
+                    <i class="far fa-star" style="font-size:40px; color:#ddd;"></i>
+                    <p>Chưa có dữ liệu</p>
+                </div>
+            </div>
+
+            <!-- Low Stock Alerts -->
+            <div class="table-card">
+                <h2><i class="fas fa-exclamation-triangle"></i> Cảnh báo tồn kho</h2>
+                <table th:if="${!lowStockProducts.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Tồn kho</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${lowStockProducts}">
+                            <td th:text="${product.tenhh}">Product Name</td>
+                            <td th:text="${product.soluong}">0</td>
+                            <td>
+                                <span class="stock-badge"
+                                    th:classappend="${product.soluong == 0 ? 'stock-out' : 'stock-low'}">
+                                    <span th:if="${product.soluong == 0}">Hết hàng</span>
+                                    <span th:if="${product.soluong > 0}">Sắp hết</span>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div th:if="${lowStockProducts.isEmpty()}" class="empty-state">
+                    <i class="fas fa-check-circle" style="font-size:40px; color:#2ecc71;"></i>
+                    <p>Tất cả sản phẩm đủ hàng</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        // Revenue Chart
+        const monthlyRevenue = /*[[${monthlyRevenue}]]*/ {};
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(monthlyRevenue),
+                datasets: [{
+                    label: 'Doanh thu (₫)',
+                    data: Object.values(monthlyRevenue),
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return value.toLocaleString('vi-VN') + ' ₫';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Order Status Chart
+        const stats = /*[[${stats}]]*/ {};
+        const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+        new Chart(orderStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Chờ xử lý', 'Đang xử lý', 'Hoàn thành'],
+                datasets: [{
+                    data: [stats.pendingOrders, stats.processingOrders, stats.completedOrders],
+                    backgroundColor: [
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(13, 110, 253, 0.8)',
+                        'rgba(25, 135, 84, 0.8)'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,253 @@
+<!-- admin/fragments/profile-form.html - Admin Profile Management -->
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title"><i class="fa fa-user"></i> Hồ sơ cá nhân</h3>
+  </div>
+  <div class="box-body">
+    <div th:if="${error}" class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <span th:text="${error}"></span>
+    </div>
+
+    <!-- Profile Information Form -->
+    <div class="row">
+      <div class="col-md-8">
+        <form id="profileForm" class="form-horizontal" enctype="multipart/form-data">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <h4 class="box-title">Thông tin cá nhân</h4>
+            </div>
+            <div class="box-body">
+              <!-- Username (Read-only) -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Tên đăng nhập</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" th:value="${user?.tendangnhap}" readonly
+                    style="background-color: #f4f4f4;" />
+                  <span class="help-block"><i class="fa fa-info-circle"></i> Không thể thay đổi tên đăng nhập</span>
+                </div>
+              </div>
+
+              <!-- Full Name -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Họ và tên <span class="text-red">*</span></label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="hoten" th:value="${user?.hoten}" required
+                    placeholder="Nhập họ và tên đầy đủ" />
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Email <span class="text-red">*</span></label>
+                <div class="col-sm-9">
+                  <input type="email" class="form-control" name="email" th:value="${user?.email}" required
+                    placeholder="email@example.com" />
+                </div>
+              </div>
+
+              <!-- Phone Number -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Số điện thoại</label>
+                <div class="col-sm-9">
+                  <input type="tel" class="form-control" name="sodienthoai" th:value="${user?.sodienthoai}"
+                    placeholder="0123456789" pattern="[0-9]{10,11}" />
+                  <span class="help-block">Nhập 10-11 chữ số</span>
+                </div>
+              </div>
+
+              <!-- Avatar Upload -->
+              <div class="form-group">
+                <label class="col-sm-3 control-label">Ảnh đại diện</label>
+                <div class="col-sm-9">
+                  <input type="file" name="avatarFile" accept="image/*" class="form-control" id="avatarInput" />
+                  <div th:if="${user?.avatar}" style="margin-top: 10px;">
+                    <label>Ảnh hiện tại:</label><br />
+                    <img th:src="@{/Images/avatars/} + ${user.avatar}" class="img-thumbnail" width="120"
+                      id="currentAvatar" />
+                  </div>
+                  <div style="margin-top: 10px; display: none;" id="previewContainer">
+                    <label>Xem trước:</label><br />
+                    <img id="avatarPreview" class="img-thumbnail" width="120" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="box-footer">
+              <button type="submit" class="btn btn-primary">
+                <i class="fa fa-save"></i> Cập nhật hồ sơ
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Change Password Form -->
+      <div class="col-md-4">
+        <form id="passwordForm" class="form-horizontal">
+          <div class="box box-warning">
+            <div class="box-header with-border">
+              <h4 class="box-title"><i class="fa fa-key"></i> Đổi mật khẩu</h4>
+            </div>
+            <div class="box-body">
+              <!-- New Password -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label>Mật khẩu mới <span class="text-red">*</span></label>
+                  <input type="password" class="form-control" name="newPassword" id="newPassword" required
+                    minlength="6" placeholder="Ít nhất 6 ký tự" />
+                </div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label>Xác nhận mật khẩu <span class="text-red">*</span></label>
+                  <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" required
+                    minlength="6" placeholder="Nhập lại mật khẩu mới" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <div class="callout callout-info" style="padding: 10px; margin-bottom: 0;">
+                    <p><i class="fa fa-info-circle"></i> Mật khẩu phải có ít nhất 6 ký tự</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="box-footer">
+              <button type="submit" class="btn btn-warning btn-block">
+                <i class="fa fa-key"></i> Đổi mật khẩu
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(function () {
+    // Preview avatar before upload
+    $('#avatarInput').on('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          $('#avatarPreview').attr('src', e.target.result);
+          $('#previewContainer').show();
+        }
+        reader.readAsDataURL(file);
+      } else {
+        $('#previewContainer').hide();
+      }
+    });
+
+    // Handle profile update
+    $('#profileForm').on('submit', function (e) {
+      e.preventDefault();
+      var formData = new FormData(this);
+      var submitBtn = $(this).find('button[type="submit"]');
+      var originalText = submitBtn.html();
+
+      submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang cập nhật...');
+
+      $.ajax({
+        url: '/admin/profile/update',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        cache: false,
+        success: function (response) {
+          submitBtn.prop('disabled', false).html(originalText);
+          if (response.success) {
+            if (typeof showToast === 'function') {
+              showToast(response.message, 'success');
+            } else {
+              alert(response.message);
+            }
+            // Reload profile to show updated data
+            setTimeout(function () {
+              loadContent('/admin/profile');
+            }, 1000);
+          } else {
+            if (typeof showToast === 'function') {
+              showToast(response.message, 'error');
+            } else {
+              alert(response.message);
+            }
+          }
+        },
+        error: function () {
+          submitBtn.prop('disabled', false).html(originalText);
+          if (typeof showToast === 'function') {
+            showToast('Lỗi hệ thống! Vui lòng thử lại.', 'error');
+          } else {
+            alert('Lỗi hệ thống! Vui lòng thử lại.');
+          }
+        }
+      });
+    });
+
+    // Handle password change
+    $('#passwordForm').on('submit', function (e) {
+      e.preventDefault();
+
+      var newPassword = $('#newPassword').val();
+      var confirmPassword = $('#confirmPassword').val();
+
+      // Validate matching passwords
+      if (newPassword !== confirmPassword) {
+        if (typeof showToast === 'function') {
+          showToast('Mật khẩu không trùng khớp!', 'error');
+        } else {
+          alert('Mật khẩu không trùng khớp!');
+        }
+        return;
+      }
+
+      var submitBtn = $(this).find('button[type="submit"]');
+      var originalText = submitBtn.html();
+
+      submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+
+      $.ajax({
+        url: '/admin/profile/change-password',
+        type: 'POST',
+        data: {
+          newPassword: newPassword,
+          confirmPassword: confirmPassword
+        },
+        success: function (response) {
+          submitBtn.prop('disabled', false).html(originalText);
+          if (response.success) {
+            if (typeof showToast === 'function') {
+              showToast(response.message, 'success');
+            } else {
+              alert(response.message);
+            }
+            // Clear form
+            $('#passwordForm')[0].reset();
+          } else {
+            if (typeof showToast === 'function') {
+              showToast(response.message, 'error');
+            } else {
+              alert(response.message);
+            }
+          }
+        },
+        error: function () {
+          submitBtn.prop('disabled', false).html(originalText);
+          if (typeof showToast === 'function') {
+            showToast('Lỗi hệ thống! Vui lòng thử lại.', 'error');
+          } else {
+            alert('Lỗi hệ thống! Vui lòng thử lại.');
+          }
+        }
+      });
+    });
+  });
+</script>

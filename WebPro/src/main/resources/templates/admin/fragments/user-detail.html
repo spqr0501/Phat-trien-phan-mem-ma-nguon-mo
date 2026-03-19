@@ -1,0 +1,47 @@
+<!-- user-detail.html -->
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Chi tiết người dùng</h3>
+        <div class="box-tools">
+            <button type="button" class="btn btn-default btn-sm" onclick="loadContent('/admin/user')">
+                <i class="fa fa-arrow-left"></i> Quay lại
+            </button>
+        </div>
+    </div>
+    <div class="box-body">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <table class="table table-bordered" th:if="${user}">
+            <tr>
+                <th style="width: 200px;">Tên đăng nhập</th>
+                <td th:text="${user.tendangnhap}"></td>
+            </tr>
+            <tr>
+                <th>Họ tên</th>
+                <td th:text="${user.hoten}"></td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td th:text="${user.email}"></td>
+            </tr>
+            <tr>
+                <th>Quyền</th>
+                <td>
+                    <span th:if="${user.admin}" class="label label-danger">Quản trị viên</span>
+                    <span th:unless="${user.admin}" class="label label-success">Người dùng</span>
+                </td>
+            </tr>
+        </table>
+
+        <div class="box-footer" th:if="${user}">
+            <a href="#" class="btn btn-primary load-content" th:data-url="@{'/admin/user/edit/' + ${user.tendangnhap}}">
+                <i class="fa fa-edit"></i> Chỉnh sửa
+            </a>
+            <button type="button" class="btn btn-default" onclick="loadContent('/admin/user')">
+                <i class="fa fa-list"></i> Danh sách
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

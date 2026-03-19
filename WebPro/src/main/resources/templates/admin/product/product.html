@@ -1,0 +1,20 @@
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Mã hàng</th><th>Tên hàng</th><th>Giá</th><th>Hình</th><th>Số lượng tồn kho</th><th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="p : ${listPro}">
+            <td th:text="${p.mahh}"></td>
+            <td th:text="${p.tenhh}"></td>
+            <td th:text="${p.dongia}"></td>
+            <td><img th:src="@{'/Images/' + ${p.hinh} + '?_t=' + ${#dates.createNow().time}}" width="80"/></td>
+            <td th:text="${p.soluong != null ? p.soluong : 0}">0</td>
+            <td>
+                <a th:href="@{'/admin/product/delete/' + ${p.mahh}}">Xóa</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<a th:href="@{/admin/product-add}" class="btn btn-success">Thêm mới</a>

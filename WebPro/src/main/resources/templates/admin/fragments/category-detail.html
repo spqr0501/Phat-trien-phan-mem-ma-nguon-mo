@@ -1,0 +1,37 @@
+<!-- category-detail.html -->
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title">Chi tiết loại hàng</h3>
+        <div class="box-tools">
+            <button type="button" class="btn btn-default btn-sm" onclick="loadContent('/admin/category')">
+                <i class="fa fa-arrow-left"></i> Quay lại
+            </button>
+        </div>
+    </div>
+    <div class="box-body">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <table class="table table-bordered" th:if="${category}">
+            <tr>
+                <th style="width: 200px;">Mã loại</th>
+                <td th:text="${category.maloai}"></td>
+            </tr>
+            <tr>
+                <th>Tên loại</th>
+                <td th:text="${category.tenloai}"></td>
+            </tr>
+        </table>
+
+        <div class="box-footer" th:if="${category}">
+            <a href="#" class="btn btn-primary load-content"
+                th:data-url="@{'/admin/category/edit/' + ${category.maloai}}">
+                <i class="fa fa-edit"></i> Chỉnh sửa
+            </a>
+            <button type="button" class="btn btn-default" onclick="loadContent('/admin/category')">
+                <i class="fa fa-list"></i> Danh sách
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

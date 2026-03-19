@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Prevent browser caching; cart content depends on session -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Giỏ Hàng - PCTech Store</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d4a373;
+        }
+
+        .logo a {
+            color: #d4a373;
+            text-decoration: none;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #d4a373;
+        }
+
+        nav a.active {
+            color: #d4a373;
+            font-weight: bold;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .user-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .admin-btn {
+            background: #d4a373;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0;
+            white-space: nowrap;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .empty-cart i {
+            font-size: 80px;
+            color: #ddd;
+        }
+
+        .empty-cart h2 {
+            font-size: 28px;
+            color: #666;
+            margin: 20px 0;
+        }
+
+        .empty-cart p {
+            font-size: 18px;
+            color: #999;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: #d4a373;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #c89968;
+        }
+
+        .cart-items {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 2fr 1fr 1fr auto;
+            gap: 20px;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .item-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .item-info span {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .item-price {
+            font-size: 20px;
+            color: #d4a373;
+            font-weight: bold;
+        }
+
+        .item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+
+        .qty-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .qty-display {
+            width: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            color: #c0392b;
+        }
+
+        .cart-summary {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 24px;
+            font-weight: bold;
+            color: #d4a373;
+            padding: 20px 0;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .clear-btn {
+            width: 100%;
+            background: #e74c3c;
+            padding: 12px;
+            margin-top: 15px;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo"><a href="/">PCTECH STORE</a></div>
+        <nav>
+            <a href="/">TRANG CHỦ</a>
+            <a href="/shop">SẢN PHẨM</a>
+            <a href="/cart" class="active">GIỎ HÀNG</a>
+            <a sec:authorize="isAuthenticated()" href="/wishlist">WISHLIST</a>
+            <a sec:authorize="isAuthenticated()" href="/orders/history">ĐƠN HÀNG</a>
+        </nav>
+
+        <div class="user-menu">
+            <div sec:authorize="isAuthenticated()">
+                <a href="/profile">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+            </div>
+
+            <div sec:authorize="hasRole('ADMIN')">
+                <a href="/admin" class="admin-btn">Quản trị</a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()" style="color:#d4a373; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-user"></i>
+                <span sec:authentication="principal.hoten">User</span>
+            </div>
+
+            <div sec:authorize="isAuthenticated()">
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </button>
+                </form>
+            </div>
+
+            <div sec:authorize="isAnonymous()">
+                <a href="/login">
+                    <i class="fas fa-sign-in-alt"></i> ĐĂNG NHẬP
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <h1>Giỏ hàng của bạn</h1>
+
+        <div th:if="${error != null}"
+            style="background:#fff3cd; border:1px solid #ffe69c; color:#856404; padding:14px 16px; border-radius:10px; margin: 18px 0;">
+            <strong>Cảnh báo:</strong> <span th:text="${error}">Error</span>
+        </div>
+
+        <!-- Empty Cart -->
+        <div th:if="${#lists.isEmpty(cartItems)}" class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h2>Giỏ hàng trống</h2>
+            <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+            <a href="/shop" class="btn">
+                <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+
+        <!-- Cart Items -->
+        <div th:if="${!#lists.isEmpty(cartItems)}">
+            <div class="cart-items">
+                <div th:each="item : ${cartItems}" class="cart-item">
+                    <!-- Image -->
+                    <img th:src="@{'/Images/' + ${item.product.hinh} + '?_t=' + ${#dates.createNow().time}}" alt="Product">
+
+                    <!-- Info -->
+                    <div class="item-info">
+                        <h3 th:text="${item.product.tenhh}">Product Name</h3>
+                        <span th:text="'Mã: ' + ${item.product.mahh}">Code</span>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="item-price"
+                        th:text="${#numbers.formatInteger(item.product.dongia, 0, 'DEFAULT')} + ' ₫'">
+                        Price
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="item-quantity">
+                        <button type="button" class="qty-btn qty-minus"
+                            th:data-mahh="${item.product.mahh}" th:data-qty="${item.quantity - 1}">-</button>
+                        <span class="qty-display" th:text="${item.quantity}">1</span>
+                        <button type="button" class="qty-btn qty-plus"
+                            th:data-mahh="${item.product.mahh}" th:data-qty="${item.quantity + 1}">+</button>
+                    </div>
+
+                    <!-- Remove -->
+                    <button type="button" class="remove-btn btn-remove"
+                        th:data-mahh="${item.product.mahh}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="cart-summary">
+                <h2>Tổng cộng</h2>
+                <div class="summary-total">
+                    <span>Tổng</span>
+                    <span th:text="${#numbers.formatInteger(total, 0, 'DEFAULT')} + ' ₫'">0 ₫</span>
+                </div>
+
+                <a href="/checkout" class="btn checkout-btn">Thanh toán</a>
+
+                <button type="button" class="btn clear-btn" onclick="clearCart()">Xóa toàn bộ giỏ hàng</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 PCTech Store - Linh kiện máy tính chính hãng</p>
+    </footer>
+
+    <script>
+        function updateCart(mahh, quantity) {
+            const formData = new FormData();
+            formData.append('mahh', mahh);
+            formData.append('quantity', quantity);
+
+            fetch('/cart/update', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                        return;
+                    }
+                    if (typeof showToast === 'function') {
+                        const type = data.errorType === 'stock' ? 'warning' : 'error';
+                        showToast(data.message || 'Không thể cập nhật giỏ hàng!', type);
+                    } else {
+                        alert(data.message || 'Không thể cập nhật giỏ hàng!');
+                    }
+                })
+                .catch(e => console.error(e));
+        }
+
+        function removeFromCart(mahh) {
+            const formData = new FormData();
+            formData.append('mahh', mahh);
+
+            fetch('/cart/remove', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) window.location.reload();
+                    else alert(data.message || 'Không thể xóa sản phẩm!');
+                })
+                .catch(e => console.error(e));
+        }
+
+        function clearCart() {
+            if (!confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) return;
+
+            fetch('/cart/clear', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) window.location.reload();
+                    else alert(data.message || 'Không thể xóa giỏ hàng!');
+                })
+                .catch(e => console.error(e));
+        }
+
+        // Attach events via data attributes
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.qty-minus, .qty-plus').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    updateCart(this.dataset.mahh, this.dataset.qty);
+                });
+            });
+
+            document.querySelectorAll('.btn-remove').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    removeFromCart(this.dataset.mahh);
+                });
+            });
+        });
+    </script>
+    <script src="/js/global.js" defer></script>
+</body>
+
+</html>

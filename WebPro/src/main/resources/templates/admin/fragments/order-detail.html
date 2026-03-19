@@ -1,0 +1,87 @@
+<div class="box box-primary">
+    <div class="box-header with-border">
+        <h3 class="box-title">Chi tiết đơn hàng #<span th:text="${order.orderId}"></span></h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool load-content" data-url="/admin/orders">
+                <i class="fa fa-arrow-left"></i> Quay lại
+            </button>
+        </div>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Thông tin người nhận</h4>
+                <p><strong>Họ tên:</strong> <span th:text="${order.customerName}"></span></p>
+                <p><strong>Số điện thoại:</strong> <span th:text="${order.phone}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${order.email}"></span></p>
+                <p><strong>Địa chỉ:</strong> <span th:text="${order.shippingAddress}"></span></p>
+                <p><strong>Ghi chú:</strong> <span th:text="${order.notes}"></span></p>
+            </div>
+            <div class="col-md-6">
+                <h4>Cập nhật trạng thái</h4>
+                <form action="/admin/orders/update-status" method="post">
+                    <input type="hidden" name="orderId" th:value="${order.orderId}">
+                    <div class="form-group">
+                        <label>Trạng thái hiện tại:</label>
+                        <select name="status" class="form-control" style="width: 200px; display: inline-block;">
+                            <option value="Pending" th:selected="${order.status == 'Pending'}">Pending (Chờ xử lý)
+                            </option>
+                            <option value="Processing" th:selected="${order.status == 'Processing'}">Processing (Đang
+                                chuẩn
+                                bị)</option>
+                            <option value="Shipping" th:selected="${order.status == 'Shipping'}">Shipping (Đang giao)
+                            </option>
+                            <option value="Completed" th:selected="${order.status == 'Completed'}">Completed (Hoàn
+                                thành)
+                            </option>
+                            <option value="Cancelled" th:selected="${order.status == 'Cancelled'}">Cancelled (Đã hủy)
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-success">Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-xs-12">
+                <h4>Danh sách sản phẩm</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-right">Đơn giá</th>
+                                <th class="text-right">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${order.orderItems}">
+                                <td th:text="${item.product.tenhh}">Product Name</td>
+                                <td class="text-center" th:text="${item.quantity}">1</td>
+                                <td class="text-right"
+                                    th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫
+                                </td>
+                                <td class="text-right"
+                                    th:text="${#numbers.formatDecimal(item.price * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' ₫'">
+                                    0 ₫</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-right"><strong>Phí vận chuyển:</strong></td>
+                                <td class="text-right">30.000 ₫</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-right"><strong>Tổng cộng:</strong></td>
+                                <td class="text-right"><strong style="color: red; font-size: 18px;"
+                                        th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0
+                                        ₫</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
