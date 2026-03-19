@@ -1,0 +1,174 @@
+*{
+    margin: 0;
+}
+
+header{
+    min-height: 50px;
+    padding-top: 10px;
+}
+
+ul{
+    list-style-type: none;
+}
+
+footer a{
+    text-decoration: none;
+    color: blue;
+}
+
+p{
+    margin-bottom: 10px;
+}
+
+hr{
+    clear: both;
+    width: 50%;
+    border-color: brown;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+#logo{
+    float: left;
+    margin-right: 10%;
+    margin-left: 5%;
+    background-color: darkgrey;
+    color: lightgrey;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#hnav{
+    min-width: 30%;
+}
+
+header form input[type="text"]{
+    background-color: grey;
+    color: brown;
+    border: 0;
+}
+
+header form input[type="button"]{
+    background-color: brown;
+    color: white;
+    border: 0;
+}
+
+#banner{
+    max-width: 100%;
+}
+
+.banner{
+    width: 100%;
+    z-index: 1;
+}
+
+.banner2{
+    z-index: 2;
+    position: relative;
+    margin-top: -30%;
+    color: white;
+    text-align: center;
+}
+
+.p1{
+    font-size: 4em;
+}
+
+.p2{
+    font-size: 1.2em;
+}
+
+.shopnow{
+    color: white;
+    background-color: pink;
+}
+
+.menu{
+    list-style-type: none;
+}
+
+.menu li a{
+    color: darkgrey;
+    float: left;
+    text-decoration: none;
+    margin-right: 2%;
+}
+
+.trending{
+    width: 90%;
+    clear: both;
+    margin-top: 20%;
+}
+
+section{
+    width: 90%;
+    margin: auto;
+    text-align: center;
+}
+
+.product img{
+    width: 90%;
+}
+
+table img{
+    width: 20px;
+    height: 20%;
+}
+
+.product{
+    width: 30%;
+    float: left;
+    margin-right: 20px;
+}
+
+.blogs{
+    column-count: 2;
+    text-align: justify;
+}
+
+.signup{
+    background-color: darkgrey;
+    min-height: 50px;
+    vertical-align: middle;
+    padding-top: 3%;
+    width: 80%;
+    margin: auto;
+    padding-left: 2%;
+}
+
+.label-signup{
+    max-width: 30%;
+    float: left;
+}
+
+.footnav1,
+.footnav2,
+.footnav3{
+    width: 30%;
+    float: left;
+    margin-right: 3%;
+}
+
+#extend-f{
+    margin-top: 5%;
+    padding-top: 5px;
+    min-height: 150px;
+    clear: both;
+    background-color: lightgrey;
+}
+
+#root-f{
+    margin-top: -25px;
+    height: 50px;
+    clear: both;
+    background-color: brown;
+    text-align: center;
+    padding-top: 15px;
+}
+
+.product button{
+    background-color: brown;
+    color: white;
+    margin-bottom: 5%;
+}
